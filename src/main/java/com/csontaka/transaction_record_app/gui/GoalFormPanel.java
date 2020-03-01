@@ -2,6 +2,7 @@ package com.csontaka.transaction_record_app.gui;
 
 import com.csontaka.transaction_record_app.entity.Period;
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -30,7 +31,7 @@ import javax.swing.border.Border;
 /**
  * Creates a form for the user to set a goal for an one-month period.
  *
- * @author Adrienn Csonták
+ * @author Adrienn Csontak
  */
 public class GoalFormPanel extends JPanel implements ItemListener {
 
@@ -158,7 +159,7 @@ public class GoalFormPanel extends JPanel implements ItemListener {
     }
 
     private void layoutComponents() {
-        titleLabel.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 24)); // NOI18N
+        titleLabel.setFont(new Font("Lucida Sans Unicode", 0, 24)); // NOI18N
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 20));
 
@@ -166,23 +167,23 @@ public class GoalFormPanel extends JPanel implements ItemListener {
         Border outerBorder = BorderFactory.createEmptyBorder(20, 20, 20, 20);
         formPanel.setBorder(BorderFactory.createCompoundBorder(outerBorder, innerBorder));
 
-        goalLabel.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14));
+        goalLabel.setFont(new Font("Lucida Sans Unicode", 0, 14));
         goalLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 
-        successLabel.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 12));
+        successLabel.setFont(new Font("Lucida Sans Unicode", 0, 12));
         successLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        dateCombo.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14));
+        dateCombo.setFont(new Font("Lucida Sans Unicode", 0, 14));
         dateCombo.setSelectedIndex(-1);
         dateCombo.addItemListener(this);
 
-        dateLabel.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14));
+        dateLabel.setFont(new Font("Lucida Sans Unicode", 0, 14));
         dateLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 
-        currencyLabel.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14));
+        currencyLabel.setFont(new Font("Lucida Sans Unicode", 0, 14));
         currencyLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 
-        confirmButton.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14));
+        confirmButton.setFont(new Font("Lucida Sans Unicode", 0, 14));
         setFormPanelLayout();
         setLayout(new BorderLayout());
         add(titleLabel, BorderLayout.NORTH);

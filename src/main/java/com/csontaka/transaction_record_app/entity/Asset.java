@@ -3,7 +3,7 @@ package com.csontaka.transaction_record_app.entity;
 /**
  * Represents an asset.
  *
- * @author Adrienn Csonták
+ * @author Adrienn Csontak
  */
 public class Asset {
 

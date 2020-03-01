@@ -5,9 +5,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Collects, inserts, updates and deletes Asset objects form the database.
+ * Collects, inserts, updates and deletes {@link com.csontaka.transaction_records.entity.Asset} 
+ * objects form the database.
  *
- * @author Adri
+ * @author Adrienn Csontak
  */
 public interface AssetRepository {
 
@@ -15,7 +16,7 @@ public interface AssetRepository {
      * Retrieves all assets from the database and gets a List object with the
      * assets.
      *
-     * @return A List of {@link com.csontaka.transaction_records.entity.Asset}
+     * @return A List of <code>Asset</code>.
      * objects
      * @throws SQLException If an SQL exception occurs.
      */
@@ -25,8 +26,7 @@ public interface AssetRepository {
      * Retrieves all assets from the database with the type product(1) and gets
      * a List object with the assets.
      *
-     * @return A List of {@link com.csontaka.transaction_records.entity.Asset}
-     * objects
+     * @return A List of <code>Asset</code> objects
      * @throws SQLException If an SQL exception occurs.
      */
     public List<Asset> findAllProducts() throws SQLException;
@@ -35,50 +35,49 @@ public interface AssetRepository {
      * Retrieves all assets from the database with the type equipment(0) and
      * gets a List object with the assets.
      *
-     * @return A List of {@link com.csontaka.transaction_records.entity.Asset}
-     * objects
+     * @return A List of <code>Asset</code> objects
      * @throws SQLException If an SQL exception occurs.
      */
     public List<Asset> findAllEquipment() throws SQLException;
 
     /**
-     * Gets an {@link com.csontaka.transaction_records.entity.Asset} object from
+     * Gets an <code>Asset</code> object from
      * the database with a specified id.
      *
      * @param id An Integer containing the asset's id.
-     * @return An Asset object.
+     * @return An <code>Asset</code> object.
      * @throws SQLException If an SQL exception occurs.
      */
     public Asset findById(Integer id) throws SQLException;
 
     /**
-     * Gets an {@link com.csontaka.transaction_records.entity.Asset} object with
+     * Gets an <code>Asset</code> object with
      * the highest id value.
      *
-     * @return An Asset object.
+     * @return An <code>Asset</code> object.
      * @throws SQLException If an SQL exception occurs.
      */
     public Integer findLatest() throws SQLException;
 
     /**
-     * Saves the given Asset object to the database.
+     * Saves the given <code>Asset</code> object to the database.
      *
-     * @param asset An Asset object to save.
+     * @param asset An <code>Asset</code> object to save.
      * @throws SQLException If an SQL exception occurs.
      */
     public void save(Asset asset) throws SQLException;
 
     /**
-     * Deletes the given Asset object to from database.
+     * Deletes the given <code>Asset</code> object to from database.
      *
-     * @param asset An Asset object to delete.
+     * @param asset An <code>Asset</code> object to delete.
      * @return True if the deleting successful, false if not.
      * @throws SQLException If an SQL exception occurs.
      */
     public boolean delete(Asset asset) throws SQLException;
 
     /**
-     * Close the PreparedStatement objects of the class.
+     * Close the <code>PreparedStatement</code> objects of the class.
      *
      * @throws SQLException If an SQL exception occurs.
      */

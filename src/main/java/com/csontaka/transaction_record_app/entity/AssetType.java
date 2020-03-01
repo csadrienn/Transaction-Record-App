@@ -3,7 +3,7 @@ package com.csontaka.transaction_record_app.entity;
 /**
  * Enum that defines an asset's type.
  *
- * @author Adri
+ * @author Adrienn Csontak
  */
 public enum AssetType {
 

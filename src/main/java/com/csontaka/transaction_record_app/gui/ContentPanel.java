@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 /**
  * Contains and displays form and table panel objects.
  *
- * @author Adri
+ * @author Adrienn Csontak
  */
 public class ContentPanel extends JPanel {
 
@@ -29,15 +29,15 @@ public class ContentPanel extends JPanel {
     private TransactionController transController;
 
     /**
-     * Creates a ContentPanel with the specified AssetController,
-     * PeriodController and TransactionController.
+     * Creates a ContentPanel with the specified <code>AssetController</code>,
+     * <code>PeriodController</code> and <code>TransactionController</code>.
      *
-     * @param assetController An AssetController object to create a connection
-     * with the AssetRepository.
-     * @param perController A PeriodController object to create a connection
-     * with the PeriodRepository.
-     * @param transController A TransactionController object to create a
-     * connection with the TransactionRepository.
+     * @param assetController An <code>AssetController</code> object to create a connection
+     * with the <code>AssetRepository</code>.
+     * @param perController A <code>PeriodController</code> object to create a connection
+     * with the <code>PeriodRepository</code>.
+     * @param transController A <code>TransactionController</code> object to create a
+     * connection with the <code>TransactionRepository</code>.
      */
     public ContentPanel(AssetController assetController, PeriodController perController, TransactionController transController) {
         this.assetController = assetController;

@@ -8,10 +8,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Creates connection between TransactionRepository and the classes of the gui
- * package.
+ * Creates connection between {@link com.csontaka.transaction_record_app.dao.TransactionRepository}
+ * and the classes of the gui package.
  *
- * @author Adri
+ * @author Adrienn Csontak
  */
 public class TransactionController {
 
@@ -29,7 +29,7 @@ public class TransactionController {
 
     /**
      * Invokes the findAllTransaction method of the
-     * {@link com.csontaka.transaction_record_app.dao.TransactionRepository}.
+     * <code>TransactionRepository</code>.
      *
      * @return A List of Transaction objects.
      * @throws SQLException If an SQL exception occurs.
@@ -40,7 +40,7 @@ public class TransactionController {
 
     /**
      * Invokes the findByPeriodId method of the
-     * {@link com.csontaka.transaction_record_app.dao.TransactionRepository}.
+     * <code>TransactionRepository</code>.
      *
      * @param periodId An Integer containing the id of the period when the
      * transaction happened.
@@ -53,7 +53,7 @@ public class TransactionController {
 
     /**
      * Invokes the findAllIncome method of the
-     * {@link com.csontaka.transaction_record_app.dao.TransactionRepository}.
+     * <code>TransactionRepository</code>.
      *
      * @return A List of Transaction object.
      * @throws SQLException If an SQL exception occurs.
@@ -64,7 +64,7 @@ public class TransactionController {
 
     /**
      * Invokes the findAllExpense method of the
-     * {@link com.csontaka.transaction_record_app.dao.TransactionRepository}.
+     * <code>TransactionRepository</code>.
      *
      * @return A List of Transaction object.
      * @throws SQLException If an SQL exception occurs.
@@ -75,7 +75,7 @@ public class TransactionController {
 
     /**
      * Invokes the save method of the
-     * {@link com.csontaka.transaction_record_app.dao.TransactionRepository}.
+     * <code>TransactionRepository</code>.
      *
      * @param transToSave A Transaction object to save.
      * @throws SQLException If an SQL exception occurs.
@@ -86,7 +86,7 @@ public class TransactionController {
 
     /**
      * Invokes the delete method of the
-     * {@link com.csontaka.transaction_record_app.dao.TransactionRepository}.
+     * <code>TransactionRepository</code>.
      *
      * @param id An Integer containing the id of the Transaction object to
      * delete.
@@ -99,7 +99,7 @@ public class TransactionController {
 
     /**
      * Invokes the close method of the
-     * {@link com.csontaka.transaction_record_app.dao.TransactionRepository}.
+     * <code>TransactionRepository</code>.
      *
      * @throws SQLException If an SQL exception occurs.
      */

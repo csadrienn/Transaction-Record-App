@@ -19,7 +19,7 @@ import javax.swing.table.AbstractTableModel;
  * {@link com.csontaka.transaction_record_app.gui.SummaryTablePanel}'s JTable
  * member.
  *
- * @author Adrienn Csonták
+ * @author Adrienn Csontak
  */
 class SummaryTableModel extends AbstractTableModel {
 
@@ -31,14 +31,14 @@ class SummaryTableModel extends AbstractTableModel {
     private final DecimalFormat DECIMAL_FORMAT = (DecimalFormat) NumberFormat.getNumberInstance(LOCALE);
 
     /**
-     * Construct a SummaryTablePanel with specified list of periods,
+     * Construct a <code>SummaryTablePanel</code> with specified list of periods,
      * TransactionController object and AssetController object.
      *
-     * @param periods A List of Period objects.
-     * @param transController A TransactionController object to create a
-     * connection with the TransactionRepository.
-     * @param assetController An AssetController object to create a connection
-     * with the AssetRepository.
+     * @param periods A List of <code>Period</code> objects.
+     * @param transController A <code>TransactionController</code> object to create a
+     * connection with the <code>TransactionRepository</code>.
+     * @param assetController An <code>AssetController</code> object to create a connection
+     * with the <code>AssetRepository</code>.
      */
     public SummaryTableModel(List<Period> periods,
             TransactionController transController, AssetController assetController) {
@@ -49,9 +49,9 @@ class SummaryTableModel extends AbstractTableModel {
     }
 
     /**
-     * Sets the List of Period objects to provide the data for displaying.
+     * Sets the List of <code>Period</code> objects to provide the data for displaying.
      *
-     * @param periods List of Period to set the class member.
+     * @param periods List of <code>Period</code> to set the class member.
      */
     public void setData(List<Period> periods) {
         this.periods = periods;

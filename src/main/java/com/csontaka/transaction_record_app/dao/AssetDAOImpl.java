@@ -13,7 +13,7 @@ import java.util.List;
  * Class that implements the methods of
  * {@link com.csontaka.transaction_record_app.dao.AssetRepository} interface.
  *
- * @author Adri
+ * @author Adrienn Csontak
  */
 public class AssetDAOImpl implements AssetRepository {
 

@@ -11,7 +11,7 @@ public interface FormListener extends EventListener{
 
     /** Invoked when an action occurs.
      *
-     * @param e A FormEvent object the transfer data.
+     * @param e A <code>FormEvent</code> object the transfer data.
      */
     public void formEventOccured(FormEvent e);
 }

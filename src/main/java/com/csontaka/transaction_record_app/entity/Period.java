@@ -5,7 +5,7 @@ import java.time.YearMonth;
 /**
  * Represents a one-month period
  *
- * @author Adri
+ * @author Adrienn Csontak
  */
 public class Period {
 

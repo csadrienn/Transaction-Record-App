@@ -35,7 +35,7 @@ import javax.swing.SwingConstants;
 /**
  * The main window of the application. Inherits the javax.swing.JFrame class.
  *
- * @author Adrienn Csonták
+ * @author Adrienn Csontak
  */
 public class MainFrame extends JFrame {
 
@@ -61,6 +61,7 @@ public class MainFrame extends JFrame {
         setSize(600, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
+        setLocationRelativeTo(null); 
 
         try {
             PROP.load(new FileReader("config.ini"));

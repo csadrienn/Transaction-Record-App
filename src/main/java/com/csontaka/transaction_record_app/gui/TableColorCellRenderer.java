@@ -16,7 +16,7 @@ import javax.swing.table.TableCellRenderer;
  * value is lower then the income value, than the cell of the goal is red, else
  * green.
  *
- * @author Adrienn Csonták
+ * @author Adrienn Csontak
  */
 public class TableColorCellRenderer implements TableCellRenderer {
 

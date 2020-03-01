@@ -14,12 +14,12 @@ import java.util.Locale;
 import javax.swing.table.AbstractTableModel;
 
 /**
- * Provides implementations for methods AbstractTableModel methods to display
+ * Provides implementations for methods <code>AbstractTableModel</code> methods to display
  * the required fields in the
  * {@link com.csontaka.transaction_record_app.gui.TransactionTablePanel}'s JTable
  * member.
  *
- * @author Adrienn Csonták
+ * @author Adrienn Csontak
  */
 public class TransactionTableModel extends AbstractTableModel {
 
@@ -31,13 +31,13 @@ public class TransactionTableModel extends AbstractTableModel {
     private List<Transaction> transactions;
 
     /**Construct a TransactionTableModel with specified list of transactions,
-     * AssetController object and PeriodController object.
+     * <code>AssetController</code> object and <code>PeriodController</code> object.
      * 
-     * @param transactions A List of Transaction objects.
-     * @param assetController An AssetController object to create a connection
-     * with the AssetRepository.
-     * @param perController A PeriodController object to create a connection
-     * with the PeriodRepository.
+     * @param transactions A List of <code>Transaction</code> objects.
+     * @param assetController An <code>AssetController</code> object to create a connection
+     * with the <code>AssetRepository</code>.
+     * @param perController A <code>PeriodController</code> object to create a connection
+     * with the <code>PeriodRepository</code>.
      */
     public TransactionTableModel(List<Transaction> transactions,
             AssetController assetController, PeriodController perController) {
@@ -48,9 +48,9 @@ public class TransactionTableModel extends AbstractTableModel {
     }
 
     /**
-     * Inserts a Transaction object to the List class member.
+     * Inserts a <code>Transaction</code> object to the List class member.
      *
-     * @param t A Transaction object to add to the List object.
+     * @param t A <code>Transaction</code> object to add to the List object.
      */
     public void addTransaction(Transaction t) {
         transactions.add(t);
@@ -61,7 +61,7 @@ public class TransactionTableModel extends AbstractTableModel {
 
     @Override
     public void fireTableRowsInserted(int firstRow, int lastRow) {
-        super.fireTableRowsInserted(firstRow, lastRow); //To change body of generated methods, choose Tools | Templates.
+        super.fireTableRowsInserted(firstRow, lastRow); 
     }
 
     @Override
@@ -72,7 +72,7 @@ public class TransactionTableModel extends AbstractTableModel {
     @Override
     public void fireTableRowsDeleted(int firstRow, int lastRow) {
         transactions.remove(lastRow);
-        super.fireTableRowsDeleted(firstRow, lastRow); //To change body of generated methods, choose Tools | Templates.
+        super.fireTableRowsDeleted(firstRow, lastRow); 
     }
 
     @Override

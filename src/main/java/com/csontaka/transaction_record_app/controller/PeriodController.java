@@ -9,10 +9,10 @@ import java.time.YearMonth;
 import java.util.List;
 
 /**
- * Creates connection between PeriodRepository and the classes of the gui
- * package
+ * Creates connection between {@link com.csontaka.transaction_record_app.dao.PeriodRepository}
+ * and the classes of the gui package.
  *
- * @author Adri
+ * @author Adrienn Csontak
  */
 public class PeriodController {
 
@@ -29,8 +29,7 @@ public class PeriodController {
     }
 
     /**
-     * Invokes the findAllPeriods method of the
-     * {@link com.csontaka.transaction_record_app.dao.PeriodRepository}.
+     * Invokes the findAllPeriods method of the <code>PeriodRepository</code>.
      *
      * @return A List of Period objects.
      * @throws SQLException If an SQL exception occurs.
@@ -40,8 +39,7 @@ public class PeriodController {
     }
 
     /**
-     * Invokes the findById method of the
-     * {@link com.csontaka.transaction_record_app.dao.PeriodRepository}.
+     * Invokes the findById method of the <code>PeriodRepository</code>.
      *
      * @param id An Integer containing the period's id.
      * @return A Period object.
@@ -53,7 +51,7 @@ public class PeriodController {
 
     /**
      * Invokes the findPeriodByDate method of the
-     * {@link com.csontaka.transaction_record_app.dao.PeriodRepository}.
+     * <code>PeriodRepository</code>.
      *
      * @param date A YearMonth object containing the date of the period.
      * @return A Period object.
@@ -65,7 +63,7 @@ public class PeriodController {
 
     /**
      * Invokes the findAfterADate method of the
-     * {@link com.csontaka.transaction_record_app.dao.PeriodRepository}.
+     * <code>PeriodRepository</code>.
      *
      * @param date A YearMonth object containing the specified date using for
      * the comparison.
@@ -75,10 +73,23 @@ public class PeriodController {
     public List<Period> findAfterADate(YearMonth date) throws SQLException {
         return daoImp.findAfter(date);
     }
+    
+    /**
+     * Invokes the findBefore method of the
+     * <code>PeriodRepository</code>.
+     *
+     * @param date A YearMonth object containing the specified date using for
+     * the comparison.
+     * @return A List of Period objects.
+     * @throws SQLException If an SQL exception occurs.
+     */
+    public List<Period> findBeforeADate(YearMonth date) throws SQLException {
+        return daoImp.findBefore(date);
+    }
 
     /**
      * Invokes the findLatest method of the
-     * {@link com.csontaka.transaction_record_app.dao.PeriodRepository}.
+     * <code>PeriodRepository</code>.
      *
      * @return A Period object.
      * @throws SQLException If an SQL exception occurs.
@@ -89,7 +100,7 @@ public class PeriodController {
 
     /**
      * Invokes the save method of the
-     * {@link com.csontaka.transaction_record_app.dao.PeriodRepository}.
+     * <code>PeriodRepository</code>.
      *
      * @param newPeriod A Period object to save.
      * @throws SQLException If an SQL exception occurs.
@@ -100,7 +111,7 @@ public class PeriodController {
 
     /**
      * Invokes the close method of the
-     * {@link com.csontaka.transaction_record_app.dao.PeriodRepository}.
+     * <code>PeriodRepository</code>.
      *
      * @throws SQLException If an SQL exception occurs.
      */

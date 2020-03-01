@@ -6,10 +6,10 @@ import com.csontaka.transaction_record_app.entity.Transaction;
 import java.util.EventObject;
 
 /**
- * Stores an Asset, a Product, a Transaction and an int for a row. Helps the
- * data transfer between panels.
+ * Stores an <code>Asset</code>, a <code>Product</code>, a <code>Transaction</code>
+ * and an int for a row. Helps the data transfer between panels.
  *
- * @author Adrienn Csonták
+ * @author Adrienn Csontak
  */
 class FormEvent extends EventObject {
 
@@ -32,9 +32,9 @@ class FormEvent extends EventObject {
      * Create a FormEvent with specified source, transaction, asset and period.
      *
      * @param source The object on which the Event initially occurred.
-     * @param transaction The Transaction object passed this FormEvent to store.
-     * @param asset The Asset object passed this FormEvent to store.
-     * @param period The Period object passed this FormEvent to store.
+     * @param transaction The <code>Transaction</code> object passed this FormEvent to store.
+     * @param asset The <code>Asset</code> object passed this FormEvent to store.
+     * @param period The <code>Product</code> object passed this FormEvent to store.
      */
     public FormEvent(Object source, Transaction transaction, Asset asset, Period period) {
         this(source);
@@ -46,7 +46,7 @@ class FormEvent extends EventObject {
     /**
      * Gets the transaction stored in the form event.
      *
-     * @return A Transaction object.
+     * @return A <code>Transaction</code> object.
      */
     public Transaction getTransaction() {
         return transaction;
@@ -55,7 +55,7 @@ class FormEvent extends EventObject {
     /**
      * Sets the transaction to be stored in the form event.
      *
-     * @param transaction A Transaction object the be stored.
+     * @param transaction A <code>Transaction</code> object the be stored.
      */
     public void setTransaction(Transaction transaction) {
         this.transaction = transaction;
@@ -64,7 +64,7 @@ class FormEvent extends EventObject {
     /**
      * Gets the asset stored in the form event.
      *
-     * @return An Asset object.
+     * @return An <code>Asset</code> object.
      */
     public Asset getAsset() {
         return asset;
@@ -73,7 +73,7 @@ class FormEvent extends EventObject {
     /**
      * Sets the asset to be stored in the form event.
      *
-     * @param asset An Asset object the be stored.
+     * @param asset An <code>Asset</code> object the be stored.
      */
     public void setAsset(Asset asset) {
         this.asset = asset;
@@ -82,7 +82,7 @@ class FormEvent extends EventObject {
     /**
      * Gets the period stored in the form event.
      *
-     * @return A Period object.
+     * @return A <code>Product</code> object.
      */
     public Period getPeriod() {
         return period;
@@ -91,7 +91,7 @@ class FormEvent extends EventObject {
     /**
      * Sets the period to be stored in the form event.
      *
-     * @param period A Period object the be stored.
+     * @param period A <code>Product</code> object the be stored.
      */
     public void setPeriod(Period period) {
         this.period = period;

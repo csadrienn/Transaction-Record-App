@@ -13,7 +13,7 @@ import java.util.List;
  * Class that implements the methods of
  * {@link com.csontaka.transaction_record_app.dao.PeriodRepository} interface.
  *
- * @author Adri
+ * @author Adrienn Csontak
  */
 public class PeriodDAOImpl implements PeriodRepository {
 
@@ -22,6 +22,7 @@ public class PeriodDAOImpl implements PeriodRepository {
     private final PreparedStatement findById;
     private final PreparedStatement findByDate;
     private final PreparedStatement findAfter;
+    private final PreparedStatement findBefore;
     private final PreparedStatement findLatest;
     private final PreparedStatement addPeriod;
     private final PreparedStatement updatePeriod;
@@ -39,6 +40,7 @@ public class PeriodDAOImpl implements PeriodRepository {
         findByDate = conn.prepareStatement("SELECT * FROM periods WHERE "
                 + "year = ? AND month = ?");
         findAfter = conn.prepareStatement("SELECT * FROM periods WHERE id > ?");
+        findBefore = conn.prepareStatement("SELECT * FROM periods WHERE id < ?");
         findLatest = conn.prepareStatement("SELECT * FROM periods WHERE "
                 + "id = (SELECT MAX(id) FROM periods);");
         addPeriod = conn.prepareStatement("INSERT INTO periods (year, month, goal) "
@@ -92,6 +94,18 @@ public class PeriodDAOImpl implements PeriodRepository {
         }
         return periods;
     }
+    
+    @Override
+    public List<Period> findBefore(YearMonth date) throws SQLException {
+        List<Period> periods;
+        Period comparePeriod = findByDate(date);
+        Integer compareId = comparePeriod.getId();
+        findBefore.setInt(1, compareId);
+        try (ResultSet periodsBeforeADate = findBefore.executeQuery()) {
+            periods = makeList(periodsBeforeADate);
+        }
+        return periods;
+    }
 
     @Override
     public Period findLatest() throws SQLException {
@@ -140,6 +154,7 @@ public class PeriodDAOImpl implements PeriodRepository {
         findById.close();
         findByDate.close();
         findAfter.close();
+        findBefore.close();
         findLatest.close();
         addPeriod.close();
         updatePeriod.close();

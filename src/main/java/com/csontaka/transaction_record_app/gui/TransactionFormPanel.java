@@ -6,6 +6,7 @@ import com.csontaka.transaction_record_app.entity.Period;
 import com.csontaka.transaction_record_app.entity.Transaction;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -35,10 +36,10 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 
 /**
- * Creates a form for the user to save a new Transaction or update an existing
+ * Creates a form for the user to save a new transaction or update an existing
  * one. Also creates a form in a dialog to save a new Product if it is needed.
  *
- * @author Adri
+ * @author Adrienn Csontak
  */
 public class TransactionFormPanel extends JPanel implements ItemListener {
 
@@ -83,7 +84,7 @@ public class TransactionFormPanel extends JPanel implements ItemListener {
      * Construct a TransactionFormPanel with a specified assetType that define
      * the transactions displayed in the table.
      *
-     * @param assetType The AssetType enum that define the type of assets.
+     * @param assetType The <code>AssetType</code> enum that define the type of assets.
      */
     public TransactionFormPanel(AssetType assetType) {
         DECIMAL_FORMAT.applyPattern("##0.00");
@@ -123,10 +124,10 @@ public class TransactionFormPanel extends JPanel implements ItemListener {
      * Prepares the form for updating. Fills the form fields and sets the combo
      * boxes with the received data.
      *
-     * @param asset An Asset containing the asset name and id to set the combo
+     * @param asset An <code>Asset</code> containing the asset name and id to set the combo
      * box.
-     * @param period A Period containing the year-month to set the combo box.
-     * @param transaction A Transaction containing the amount and price to fill
+     * @param period A <code>Period</code> containing the year-month to set the combo box.
+     * @param transaction A <code>Transaction</code> containing the amount and price to fill
      * the text fields.
      */
     public void setUpForUpdate(Asset asset, Period period, Transaction transaction) {
@@ -140,7 +141,7 @@ public class TransactionFormPanel extends JPanel implements ItemListener {
     }
 
     /**
-     * Prepares the form for adding new Transaction. Clears the text field. Set
+     * Prepares the form for adding new transaction. Clears the text field. Set
      * the asset combo box to the first item and the date combo box to the last
      * item.
      *
@@ -169,9 +170,9 @@ public class TransactionFormPanel extends JPanel implements ItemListener {
      * Sets the title label of the form. Fills the combo boxes with data to
      * create the items.
      *
-     * @param periods A List of Period objects to use the year-month values as
+     * @param periods A List of <code>Period</code> objects to use the year-month values as
      * items.
-     * @param assets A List of Asset objects to use the name and the id values
+     * @param assets A List of <code>Asset</code> objects to use the name and the id values
      * as items.
      */
     public void setUpComboBoxesAndTitle(List<Period> periods, List<Asset> assets) {
@@ -303,7 +304,7 @@ public class TransactionFormPanel extends JPanel implements ItemListener {
     }
 
     private void layoutComponents() {
-        titleLabel.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 24)); // NOI18N
+        titleLabel.setFont(new Font("Lucida Sans Unicode", 0, 24)); // NOI18N
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 20));
 
@@ -320,30 +321,30 @@ public class TransactionFormPanel extends JPanel implements ItemListener {
     }
 
     private void setFonts() {
-        assetLabel.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14)); // NOI18N
+        assetLabel.setFont(new Font("Lucida Sans Unicode", 0, 14)); // NOI18N
         assetLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 
-        dateLabel.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14)); // NOI18N
+        dateLabel.setFont(new Font("Lucida Sans Unicode", 0, 14)); // NOI18N
         dateLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 
-        priceLabel.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14)); // NOI18N
+        priceLabel.setFont(new Font("Lucida Sans Unicode", 0, 14)); // NOI18N
         priceLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 
-        currencyLabel.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14)); // NOI18N
+        currencyLabel.setFont(new Font("Lucida Sans Unicode", 0, 14)); // NOI18N
         currencyLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 
-        amountLabel.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14)); // NOI18N
+        amountLabel.setFont(new Font("Lucida Sans Unicode", 0, 14)); // NOI18N
         amountLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 
-        successLabel.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 12)); // NOI18N
+        successLabel.setFont(new Font("Lucida Sans Unicode", 0, 12)); // NOI18N
         successLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        assetCombo.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14));
-        dateCombo.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14)); // NOI18N
+        assetCombo.setFont(new Font("Lucida Sans Unicode", 0, 14));
+        dateCombo.setFont(new Font("Lucida Sans Unicode", 0, 14)); // NOI18N
 
-        saveButton.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14));
+        saveButton.setFont(new Font("Lucida Sans Unicode", 0, 14));
         saveButton.setPreferredSize(new Dimension(80, 35));
-        leaveButton.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14));
+        leaveButton.setFont(new Font("Lucida Sans Unicode", 0, 14));
         leaveButton.setPreferredSize(new Dimension(80, 35));
     }
 
@@ -425,11 +426,11 @@ public class TransactionFormPanel extends JPanel implements ItemListener {
         newAssetDialog.setSize(550, 300);
 
         nameLabel = new JLabel("Name:");
-        nameLabel.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14));
+        nameLabel.setFont(new Font("Lucida Sans Unicode", 0, 14));
         featureArea = new JTextArea(3, 30);
         featureScrollPane = new JScrollPane(featureArea);
         featureLabel = new JLabel("Feature:");
-        featureLabel.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14));
+        featureLabel.setFont(new Font("Lucida Sans Unicode", 0, 14));
         nameField = new JTextField(15);
 
         buttonPanel = new JPanel();
@@ -467,7 +468,7 @@ public class TransactionFormPanel extends JPanel implements ItemListener {
     }
 
     private void setUpDialogBtns() {
-        okBtn.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14));
+        okBtn.setFont(new Font("Lucida Sans Unicode", 0, 14));
         okBtn.addActionListener(new ActionListener() {
 
             @Override
@@ -482,7 +483,7 @@ public class TransactionFormPanel extends JPanel implements ItemListener {
                 featureArea.setText("");
             }
         });
-        cancelBtn.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14));
+        cancelBtn.setFont(new Font("Lucida Sans Unicode", 0, 14));
         cancelBtn.addActionListener(new ActionListener() {
 
             @Override

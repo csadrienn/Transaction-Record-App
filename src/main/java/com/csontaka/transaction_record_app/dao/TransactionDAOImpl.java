@@ -13,7 +13,7 @@ import java.util.List;
  * {@link com.csontaka.transaction_record_app.dao.TransactionRepository}
  * interface.
  *
- * @author Adri
+ * @author Adrienn Csontak
  */
 public class TransactionDAOImpl implements TransactionRepository {
 
