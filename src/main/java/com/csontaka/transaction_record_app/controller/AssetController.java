@@ -8,8 +8,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Creates connection between {@link com.csontaka.transaction_record_app.dao.AssetRepository}
- * and the classes of the gui package.
+ * Creates connection between
+ * {@link com.csontaka.transaction_record_app.dao.AssetRepository} and the
+ * classes of the gui package.
  *
  * @author Adrienn Csontak
  */
@@ -28,9 +29,8 @@ public class AssetController {
     }
 
     /**
-     * Invokes the findById method of the
-     * <code>AssetRepository</code>.
-     * 
+     * Invokes the findById method of the <code>AssetRepository</code>.
+     *
      * @param id An Integer containing the asset's id.
      * @return An Asset object.
      * @throws SQLException If an SQL exception occurs.
@@ -40,8 +40,7 @@ public class AssetController {
     }
 
     /**
-     * Invokes the findAllProducts method of the
-     * <code>AssetRepository</code>.
+     * Invokes the findAllProducts method of the <code>AssetRepository</code>.
      *
      * @return return A List of Asset objects.
      * @throws SQLException If an SQL exception occurs.
@@ -51,8 +50,7 @@ public class AssetController {
     }
 
     /**
-     * Invokes the findAllEquipment method of the
-     * <code>AssetRepository</code>.
+     * Invokes the findAllEquipment method of the <code>AssetRepository</code>.
      *
      * @return return A List of Asset objects.
      * @throws SQLException If an SQL exception occurs.
@@ -62,8 +60,7 @@ public class AssetController {
     }
 
     /**
-     * Invokes the findLatest method of the
-     * <code>AssetRepository</code>.
+     * Invokes the findLatest method of the <code>AssetRepository</code>.
      *
      * @return An Integer represents the id of an Asset.
      * @throws SQLException If an SQL exception occurs.
@@ -73,8 +70,7 @@ public class AssetController {
     }
 
     /**
-     * Invokes the save method of the
-     * <code>AssetRepository</code>.
+     * Invokes the save method of the <code>AssetRepository</code>.
      *
      * @param assetToSave An Asset object to save.
      * @throws SQLException If an SQL exception occurs.
@@ -84,8 +80,18 @@ public class AssetController {
     }
 
     /**
-     * Invokes the close method of the
-     * <code>AssetRepository</code>.
+     * Invokes the delete method of the <code>AssetRepository</code>.
+     *
+     * @param assetToDelete An Asset object to delete.
+     * @return True if delete is successful false if delete failed.
+     * @throws SQLException If an SQL exception occurs.
+     */
+    public boolean delete(Asset assetToDelete) throws SQLException {
+        return daoImp.delete(assetToDelete);
+    }
+
+    /**
+     * Invokes the close method of the <code>AssetRepository</code>.
      *
      * @throws SQLException If an SQL exception occurs.
      */

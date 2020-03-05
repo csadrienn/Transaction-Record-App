@@ -3,7 +3,6 @@ package com.csontaka.transaction_record_app.gui;
 import com.csontaka.transaction_record_app.controller.AssetController;
 import com.csontaka.transaction_record_app.controller.PeriodController;
 import com.csontaka.transaction_record_app.controller.TransactionController;
-import com.csontaka.transaction_record_app.entity.Asset;
 import com.csontaka.transaction_record_app.entity.AssetType;
 import com.csontaka.transaction_record_app.entity.Period;
 import java.awt.CardLayout;
@@ -23,6 +22,7 @@ public class ContentPanel extends JPanel {
     private GoalFormPanel goalFormPanel;
     private TransactionFormPanel incomeFormPanel;
     private TransactionFormPanel expenseFormPanel;
+    private InventoryPanel inventoryPanel;
 
     private AssetController assetController;
     private PeriodController perController;
@@ -53,14 +53,18 @@ public class ContentPanel extends JPanel {
         goalFormPanel = new GoalFormPanel();
         incomeFormPanel = new TransactionFormPanel(AssetType.PRODUCT);
         expenseFormPanel = new TransactionFormPanel(AssetType.EQUIPMENT);
+        inventoryPanel = new InventoryPanel(assetController, transController);
 
         setLayout(new CardLayout());
+        
         add("incomeFormPanel", incomeFormPanel);
         add("expenseFormPanel", expenseFormPanel);
         add("summaryTablePanel", summaryTablePanel);
         add("incomeTablePanel", incomeTablePanel);
         add("expenseTablePanel", expenseTablePanel);
         add("goalFormPanel", goalFormPanel);
+        add("inventoryPanel", inventoryPanel);
+        
     }
 
     /**
@@ -94,30 +98,30 @@ public class ContentPanel extends JPanel {
     }
 
     /**
-     * Gets the content panel's getGoalFormPanel object that display a form for
+     * Gets the content panel's GoalFormPanel object that display a form for
      * goal setting.
      *
-     * @return A getGoalFormPanel object.
+     * @return A GoalFormPanel object.
      */
     public GoalFormPanel getGoalFormPanel() {
         return goalFormPanel;
     }
 
     /**
-     * Gets the content panel's getIncomeFormPanel object that display a form
+     * Gets the content panel's TransactionFormPanel object that display a form
      * for saving or updating incomes.
      *
-     * @return A getIncomeFormPanel object.
+     * @return A TransactionFormPanel object.
      */
     public TransactionFormPanel getIncomeFormPanel() {
         return incomeFormPanel;
     }
 
     /**
-     * Gets the content panel's getIncomeFormPanel object that display a form
+     * Gets the content panel's TransactionFormPanel object that display a form
      * for saving or updating expenses.
      *
-     * @return A getExpenseFormPanel object.
+     * @return A TransactionFormPanel object.
      */
     public TransactionFormPanel getExpenseFormPanel() {
         return expenseFormPanel;
@@ -134,19 +138,12 @@ public class ContentPanel extends JPanel {
         goalFormPanel.setPeriods(periods);
     }
 
-    /**
-     * Sets the periods and assets that are shown on a transaction form panel so
-     * the user can save or update a transaction connected with a chosen period
-     * and asset.
+    /**Gets the content panel's InventoryPanel object that display a form
+     * for saving or updating incomes.
      *
-     * @param periods A List object containing the Period to show on the
-     * transaction setting form.
-     * @param assets A List object containing the Asset to show on the
-     * transaction setting form.
+     * @return An InventoryPanel object.
      */
-    public void setTransactionFormPanelsData(List<Period> periods, List<Asset> assets) {
-        incomeFormPanel.setUpComboBoxesAndTitle(periods, assets);
-        expenseFormPanel.setUpComboBoxesAndTitle(periods, assets);
-
+    public InventoryPanel getInventoryPanel() {
+        return inventoryPanel;
     }
 }

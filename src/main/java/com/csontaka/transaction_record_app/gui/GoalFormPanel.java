@@ -54,24 +54,27 @@ public class GoalFormPanel extends JPanel implements ItemListener {
     private JLabel currencyLabel;
     private JButton confirmButton;
 
-    private DateTimeFormatter df;
-    private Locale locale = new Locale("en", "UK");
-    private DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getNumberInstance(locale);
+    private final DateTimeFormatter DF;
+    private final Locale LOCALE = new Locale("en", "UK");
+    private final DecimalFormat DECIMAL_FORMAT = (DecimalFormat) NumberFormat.getNumberInstance(LOCALE);
+    private final String SEP = DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator() + "";
     private FormListener goalFormListener;
+    
 
     /**
      * Default constructor. Initializes the class members and displays the
      * components.
      */
     public GoalFormPanel() {
-        decimalFormat.applyPattern("##0.00");
-        df = DateTimeFormatter.ofPattern(PATTERN);
+        DECIMAL_FORMAT.applyPattern("##0.00");
+        DF = DateTimeFormatter.ofPattern(PATTERN);
         this.periods = new ArrayList<>();
         titleLabel = new JLabel("Goal setting");
         formPanel = new JPanel();
         goalLabel = new JLabel("Goal:");
         successLabel = new JLabel("");
         goalTextField = new JTextField(7);
+        goalTextField.setText("0" + SEP + "00");
         dateLabel = new JLabel("Date:");
         currencyLabel = new JLabel("£");
         confirmButton = new JButton("Save");
@@ -79,7 +82,7 @@ public class GoalFormPanel extends JPanel implements ItemListener {
         YearMonth ym = YearMonth.now();
         String[] dates = new String[MAX_PERIOD_DATE];
         for (int i = 0; i < dates.length; i++) {
-            dates[i] = df.format(ym);
+            dates[i] = DF.format(ym);
             ym = ym.plusMonths(1);
         }
         dateCombo = new JComboBox(dates);
@@ -89,21 +92,19 @@ public class GoalFormPanel extends JPanel implements ItemListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String message = null;
-                String sep = decimalFormat.getDecimalFormatSymbols().getDecimalSeparator() + "";
+                
                 String goalStr = goalTextField.getText();
                 String date = (String) dateCombo.getSelectedItem();
-                goalStr = goalStr.replace(sep, "");
-                System.out.println(goalStr);
+                goalStr = goalStr.replace(SEP, "");
                 if (date != null) {
                     try {
                         int goal = Integer.parseInt(goalStr);
-                        System.out.println(goal);
-                        Period period = new Period(YearMonth.parse(date, df));
+                        Period period = new Period(YearMonth.parse(date, DF));
                         period.setGoal(goal);
                         FormEvent formEvent = new FormEvent(this);
                         formEvent.setPeriod(period);
                         successLabel.setText(SUCCES);
-                        goalTextField.setText("");
+                        goalTextField.setText("0" + SEP + "00");
                         if (goalFormListener != null) {
                             goalFormListener.formEventOccured(formEvent);
                         }
@@ -151,9 +152,9 @@ public class GoalFormPanel extends JPanel implements ItemListener {
 
             if (period.getGoal() > 0) {
                 double goal = period.getGoal() / 100.0;
-                goalTextField.setText(decimalFormat.format(goal));
+                goalTextField.setText(DECIMAL_FORMAT.format(goal));
             } else {
-                goalTextField.setText("");
+                goalTextField.setText("0" + SEP + "00");
             }
         }
     }
@@ -217,13 +218,12 @@ public class GoalFormPanel extends JPanel implements ItemListener {
 
         gbc.gridx = 1;
         gbc.gridy = 1;
-        gbc.insets = new Insets(0, -10, 30, 0);
-        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        gbc.insets = new Insets(0, -15, 30, 0);
         formPanel.add(currencyLabel, gbc);
 
-        gbc.gridx = 2;
+        gbc.gridx = 1;
         gbc.gridy = 1;
-        gbc.insets = new Insets(-3, -92, 30, 0);
+        gbc.insets = secondColumnInsets;
         formPanel.add(goalTextField, gbc);
 
         gbc.gridx = 0;

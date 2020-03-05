@@ -40,10 +40,10 @@ public class AssetDAOImpl implements AssetRepository {
         findAllEquipment = conn.prepareStatement("SELECT * FROM transaction_records.assets WHERE type = 0");
         findById = conn.prepareStatement("SELECT * FROM transaction_records.assets WHERE id = ?");
         findLatest = conn.prepareStatement("SELECT MAX(id) as id FROM assets");
-        addAsset = conn.prepareStatement("INSERT INTO assets (name, feature, type) "
-                + "VALUES( ?,  ?,  ?)");
+        addAsset = conn.prepareStatement("INSERT INTO assets (name, feature, type, stock, planned_price) "
+                + "VALUES( ?,  ?,  ?, ?, ?)");
         updateAsset = conn.prepareStatement("UPDATE assets SET "
-                + "name = ?, feature = ?, type = ? WHERE id = ?");
+                + "name = ?, feature = ?, type = ?, stock = ?, planned_price = ? WHERE id = ?");
         deleteAsset = conn.prepareStatement("DELETE FROM assets WHERE id = ?");
     }
 
@@ -77,22 +77,24 @@ public class AssetDAOImpl implements AssetRepository {
     @Override
     public Asset findById(Integer id) throws SQLException {
         findById.setInt(1, id);
-        Asset asset;
+        Asset asset = null;
         try (ResultSet assetById = findById.executeQuery()) {
             assetById.beforeFirst();
-            assetById.next();
-            asset = makeOne(assetById);
+            if (assetById.next()) {
+                asset = makeOne(assetById);
+            }
         }
         return asset;
     }
 
     @Override
     public Integer findLatest() throws SQLException {
-        Integer id;
+        Integer id = null;
         try (ResultSet latestAsset = findLatest.executeQuery()) {
             latestAsset.beforeFirst();
-            latestAsset.next();
-            id = latestAsset.getInt("id");
+            if (latestAsset.next()) {
+                id = latestAsset.getInt("id");
+            }
         }
         return id;
     }
@@ -112,27 +114,28 @@ public class AssetDAOImpl implements AssetRepository {
             addAsset.setString(2, asset.getFeature());
             AssetType type = asset.getType();
             int typeNum = 1;
-            if (type == AssetType.EQUIPMENT) {
+            if (type.equals(AssetType.EQUIPMENT)) {
                 typeNum = 0;
             }
             addAsset.setInt(3, typeNum);
+            addAsset.setInt(4, asset.getStock());
+            addAsset.setInt(5, asset.getPlannedPrice());
             addAsset.executeUpdate();
         }
     }
 
     private void update(Asset asset) throws SQLException {
-        Integer id = asset.getId();
-        String name = asset.getName();
-        String feature = asset.getFeature();
         AssetType type = asset.getType();
         int typeNum = 1;
-        if (type == AssetType.EQUIPMENT) {
+        if (type.equals(AssetType.EQUIPMENT)) {
             typeNum = 0;
         }
-        updateAsset.setString(1, name);
-        updateAsset.setString(2, feature);
+        updateAsset.setString(1, asset.getName());
+        updateAsset.setString(2, asset.getFeature());
         updateAsset.setInt(3, typeNum);
-        updateAsset.setInt(4, id);
+        updateAsset.setInt(4, asset.getStock());
+        updateAsset.setInt(5, asset.getPlannedPrice());
+        updateAsset.setInt(6, asset.getId());
         updateAsset.executeUpdate();
     }
 
@@ -176,8 +179,12 @@ public class AssetDAOImpl implements AssetRepository {
         if (typeNum == 1) {
             type = AssetType.PRODUCT;
         }
+        int stock = rs.getInt("stock");
+        int plannedPrice = rs.getInt("planned_price");
         Asset asset = new Asset(assetName, feature, type);
         asset.setId(id);
+        asset.setStock(stock);
+        asset.setPlannedPrice(plannedPrice);
         return asset;
     }
 }

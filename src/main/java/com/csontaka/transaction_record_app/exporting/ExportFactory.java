@@ -11,7 +11,7 @@ public class ExportFactory {
  based on the received String.
      *
      * @param exportType A String object containing the type of the export.
-     * @return An <code>TableExport</object> based on the received type.
+     * @return An <code>TableExport</code> object based on the received type.
      */
     public static TableExport getExport(String exportType){
         if(exportType.equalsIgnoreCase("csv")){

@@ -8,16 +8,15 @@ import com.csontaka.transaction_record_app.entity.Transaction;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.time.YearMonth;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.table.AbstractTableModel;
 
 /**
- * Provides implementations for methods <code>AbstractTableModel</code> methods to display
- * the required fields in the
- * {@link com.csontaka.transaction_record_app.gui.TransactionTablePanel}'s JTable
- * member.
+ * Provides implementations for methods <code>AbstractTableModel</code> methods
+ * to display the required fields in the
+ * {@link com.csontaka.transaction_record_app.gui.TransactionTablePanel}'s
+ * JTable member.
  *
  * @author Adrienn Csontak
  */
@@ -30,14 +29,16 @@ public class TransactionTableModel extends AbstractTableModel {
     private AssetController assetController;
     private List<Transaction> transactions;
 
-    /**Construct a TransactionTableModel with specified list of transactions,
-     * <code>AssetController</code> object and <code>PeriodController</code> object.
-     * 
+    /**
+     * Construct a TransactionTableModel with specified list of transactions,
+     * <code>AssetController</code> object and <code>PeriodController</code>
+     * object.
+     *
      * @param transactions A List of <code>Transaction</code> objects.
-     * @param assetController An <code>AssetController</code> object to create a connection
-     * with the <code>AssetRepository</code>.
-     * @param perController A <code>PeriodController</code> object to create a connection
-     * with the <code>PeriodRepository</code>.
+     * @param assetController An <code>AssetController</code> object to create a
+     * connection with the <code>AssetRepository</code>.
+     * @param perController A <code>PeriodController</code> object to create a
+     * connection with the <code>PeriodRepository</code>.
      */
     public TransactionTableModel(List<Transaction> transactions,
             AssetController assetController, PeriodController perController) {
@@ -48,7 +49,9 @@ public class TransactionTableModel extends AbstractTableModel {
     }
 
     /**
-     * Inserts a <code>Transaction</code> object to the List class member.
+     * Inserts a <code>Transaction</code> object to the List class member and
+     * invokes the fireTableRowsInserted method of the
+     * <code>AbstractTableModel</code>.
      *
      * @param t A <code>Transaction</code> object to add to the List object.
      */
@@ -59,20 +62,35 @@ public class TransactionTableModel extends AbstractTableModel {
 
     }
 
-    @Override
-    public void fireTableRowsInserted(int firstRow, int lastRow) {
-        super.fireTableRowsInserted(firstRow, lastRow); 
+    /**
+     * Removes a <code>Transaction</code> object to the List class member and
+     * invokes the fireTableRowsDeleted method of the
+     * <code>AbstractTableModel</code>.
+     *
+     * @param transToDelete A <code>Transaction</code> object to remove from the
+     * list.
+     */
+    public void deleteFromModel(Transaction transToDelete) {
+        int row = -1;
+        for (int i = 0; i < transactions.size() && row < 0; i++) {
+            if (transactions.get(i).getId().equals(transToDelete.getId())) {
+                row = i;
+            }
+        }
+        transactions.remove(row);
+        fireTableRowsDeleted(row, row);
     }
 
-    @Override
-    public void fireTableStructureChanged() {
-        super.fireTableDataChanged();
-    }
-
-    @Override
-    public void fireTableRowsDeleted(int firstRow, int lastRow) {
-        transactions.remove(lastRow);
-        super.fireTableRowsDeleted(firstRow, lastRow); 
+    /**
+     * Sets the list of transactions to the received list. Invokes the
+     * fireTableDataChanged method of the <code>AbstractTableModel</code>.
+     *
+     * @param trans A List of <code>Transaction</code> object containing the
+     * updated values.
+     */
+    public void updateTransactions(List<Transaction> trans) {
+        this.transactions = trans;
+        fireTableDataChanged();
     }
 
     @Override
@@ -82,17 +100,11 @@ public class TransactionTableModel extends AbstractTableModel {
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        if (columnIndex == 0) {
-            return Integer.class;
-        } else if (columnIndex == 1) {
-            return YearMonth.class;
-        } else if (columnIndex == 2) {
-            return String.class;
-        } else if (columnIndex == 3) {
-            return String.class;
-        } else {
-            return Integer.class;
+        if (transactions.isEmpty()) {
+            return Object.class;
         }
+        return getValueAt(0, columnIndex).getClass();
+
     }
 
     @Override

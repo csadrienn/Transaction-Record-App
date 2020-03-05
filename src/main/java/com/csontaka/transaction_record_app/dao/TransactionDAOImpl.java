@@ -67,11 +67,12 @@ public class TransactionDAOImpl implements TransactionRepository {
     @Override
     public Transaction findById(Integer id) throws SQLException {
         findById.setInt(1, id);
-        Transaction transaction;
+        Transaction transaction = null;
         try (ResultSet transById = findById.executeQuery()) {
             transById.beforeFirst();
-            transById.next();
-            transaction = makeOne(transById);
+            if (transById.next()) {
+                transaction = makeOne(transById);
+            }
         }
         return transaction;
     }
@@ -116,11 +117,12 @@ public class TransactionDAOImpl implements TransactionRepository {
 
     @Override
     public Integer findLatest() throws SQLException {
-        Integer id;
+        Integer id = null;
         try (ResultSet latestTransaction = findLatest.executeQuery()) {
             latestTransaction.beforeFirst();
-            latestTransaction.next();
-            id = latestTransaction.getInt("id");
+            if (latestTransaction.next()) {
+                id = latestTransaction.getInt("id");
+            }
         }
         return id;
     }

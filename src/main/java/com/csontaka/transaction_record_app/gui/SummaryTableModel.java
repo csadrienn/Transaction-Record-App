@@ -7,7 +7,6 @@ import com.csontaka.transaction_record_app.entity.Transaction;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -31,14 +30,14 @@ class SummaryTableModel extends AbstractTableModel {
     private final DecimalFormat DECIMAL_FORMAT = (DecimalFormat) NumberFormat.getNumberInstance(LOCALE);
 
     /**
-     * Construct a <code>SummaryTablePanel</code> with specified list of periods,
-     * TransactionController object and AssetController object.
+     * Construct a <code>SummaryTablePanel</code> with specified list of
+     * periods, TransactionController object and AssetController object.
      *
      * @param periods A List of <code>Period</code> objects.
-     * @param transController A <code>TransactionController</code> object to create a
-     * connection with the <code>TransactionRepository</code>.
-     * @param assetController An <code>AssetController</code> object to create a connection
-     * with the <code>AssetRepository</code>.
+     * @param transController A <code>TransactionController</code> object to
+     * create a connection with the <code>TransactionRepository</code>.
+     * @param assetController An <code>AssetController</code> object to create a
+     * connection with the <code>AssetRepository</code>.
      */
     public SummaryTableModel(List<Period> periods,
             TransactionController transController, AssetController assetController) {
@@ -49,15 +48,17 @@ class SummaryTableModel extends AbstractTableModel {
     }
 
     /**
-     * Sets the List of <code>Period</code> objects to provide the data for displaying.
+     * Sets the List of <code>Period</code> objects to provide the data for
+     * displaying. Invokes the fireTableDataChanged method of the
+     * <code>AbstractTableModel</code>
      *
      * @param periods List of <code>Period</code> to set the class member.
      */
     public void setData(List<Period> periods) {
         this.periods = periods;
+        fireTableDataChanged();
     }
 
-    
     @Override
     public String getColumnName(int column) {
         return COL_NAMES[column];
@@ -65,13 +66,10 @@ class SummaryTableModel extends AbstractTableModel {
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        if (columnIndex == 0) {
-            return YearMonth.class;
-        } else if (columnIndex == 1) {
-            return String.class;
-        } else {
-            return String.class;
+        if (periods.isEmpty()) {
+            return Object.class;
         }
+        return getValueAt(0, columnIndex).getClass();
     }
 
     @Override

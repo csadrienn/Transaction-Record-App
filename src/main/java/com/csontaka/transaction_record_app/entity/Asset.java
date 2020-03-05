@@ -11,6 +11,8 @@ public class Asset {
     private String name;
     private String feature;
     private AssetType type;
+    private int stock;
+    private int plannedPrice;
 
     /**
      * Default constructor to create an Asset.
@@ -106,9 +108,42 @@ public class Asset {
         this.feature = feature;
     }
 
-    @Override
-    public String toString() {
-        return id + ", " + name;
+    /**
+     * Gets the asset’s stock.
+     *
+     * @return An int representing the stock of the asset;
+     */
+    public int getStock() {
+        return stock;
+    }
+
+    /**
+     * Sets the asset’s stock.
+     *
+     * @param stock An int containing the stock of the asset;
+     */
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
+
+    /**
+     * Gets the asset’s planned sales price or the general purchase price.
+     *
+     * @return An int representing asset's planned sales price or the general
+     * purchase price;
+     */
+    public int getPlannedPrice() {
+        return plannedPrice;
+    }
+
+    /**
+     * Sets the asset’s planned sales price or the general purchase price.
+     *
+     * @param plannedPrice An int containing asset's planned sales price or the
+     * general purchase price;
+     */
+    public void setPlannedPrice(int plannedPrice) {
+        this.plannedPrice = plannedPrice;
     }
 
 }

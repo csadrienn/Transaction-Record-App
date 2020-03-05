@@ -26,6 +26,8 @@ import java.sql.SQLException;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -42,10 +44,12 @@ public class MainFrame extends JFrame {
     private JPanel menuPanel;
     private JLabel dataLabel;
     private JLabel goalLabel;
+    private JLabel inventoryLabel;
     private JButton incomeBtn;
     private JButton expenseBtn;
     private JButton summaryBtn;
     private JButton goalBtn;
+    private JButton inventoryBtn;
     private ContentPanel contentPanel;
     private Connection conn;
     private AssetController assetController;
@@ -58,15 +62,15 @@ public class MainFrame extends JFrame {
      * operation, its component and the database connection.
      */
     public MainFrame() {
-        setSize(600, 500);
+        setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
-        setLocationRelativeTo(null); 
+        setLocationRelativeTo(null);
 
         try {
             PROP.load(new FileReader("config.ini"));
         } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
             String server = PROP.getProperty("server");
@@ -82,7 +86,14 @@ public class MainFrame extends JFrame {
             contentPanel = new ContentPanel(assetController,
                     periodController, transController);
 
-            YearMonth lastPeriodDate = periodController.findLatest().getDate();
+            Period lastPeriod = periodController.findLatest();
+            YearMonth lastPeriodDate;
+            if(lastPeriod != null){
+               lastPeriodDate = lastPeriod.getDate();
+            }else{
+                lastPeriodDate = YearMonth.now().minusMonths(2);
+            }
+            
             YearMonth monthsFromNow = YearMonth.now()
                     .plusMonths(GoalFormPanel.MAX_PERIOD_DATE - 1);
 
@@ -94,7 +105,7 @@ public class MainFrame extends JFrame {
             }
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, e);
         }
 
         addWindowListener(new WindowAdapter() {
@@ -106,7 +117,7 @@ public class MainFrame extends JFrame {
                     assetController.close();
                     conn.close();
                 } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
+                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 System.exit(0);
             }
@@ -135,15 +146,16 @@ public class MainFrame extends JFrame {
                     periodToChange.setGoal(newGoal);
 
                     periodController.save(periodToChange);
-                    List<Period> periods = periodController
+                    List<Period> periodsToGoals = periodController
                             .findAfterADate(YearMonth.now().minusMonths(1));
-                    contentPanel.getGoalFormPanel().setPeriods(periods);
-                    contentPanel.getSummaryTablePanel().refresh();
+                    List<Period> periodsToSummaryTable = periodController.
+                            findBeforeADate(YearMonth.now().plusMonths(1));
+                    contentPanel.getGoalFormPanel().setPeriods(periodsToGoals);
+                    contentPanel.getSummaryTablePanel().refresh(periodsToSummaryTable);
 
                 } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
+                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
             }
         });
 
@@ -158,23 +170,32 @@ public class MainFrame extends JFrame {
                     Transaction transToSave = e.getTransaction();
                     Asset assetToSave = e.getAsset();
                     try {
-                        if (assetToSave != null) {
-                            transController.save(transToSave);
-
+                        assetController.save(assetToSave);
+                        if (assetToSave.getId() == null) {
+                            Integer assetToSaveId = assetController.findLatest();
+                            assetToSave.setId(assetToSaveId);
+                            contentPanel.getInventoryPanel().getProductPanel().insertToTable(assetToSave);
+                            transToSave.setAssetId(assetToSaveId);
                         } else {
-                            assetController.save(assetToSave);
-                            Integer savedAssetId = assetController.findLatest();
-                            transToSave.setAssetId(savedAssetId);
-                            transController.save(transToSave);
+                            List<Asset> assets = assetController.findAllProducts();
+                            contentPanel.getInventoryPanel().getProductPanel().updateAssetsInModel(assets);
+                        }
+                        transController.save(transToSave);
+                        if (transToSave.getId() == null) {
+                            Integer id = transController.findLatest();
+                            transToSave.setId(id);
+                            contentPanel.getIncomeTablePanel().insertToTable(transToSave);
+                        } else {
+                            List<Transaction> trans = transController.findAllIncome();
+                            contentPanel.getIncomeTablePanel().refresh(trans);
                         }
 
                     } catch (SQLException ex) {
-                        System.out.println(ex.getMessage());
-
+                        Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    CardLayout cl = (CardLayout) contentPanel.getLayout();
-                    cl.show(contentPanel, "incomeTablePanel");
                 }
+                CardLayout cl = (CardLayout) contentPanel.getLayout();
+                cl.show(contentPanel, "incomeTablePanel");
             }
         });
     }
@@ -184,27 +205,36 @@ public class MainFrame extends JFrame {
 
             @Override
             public void formEventOccured(FormEvent e) {
-                if (e.getTransaction() != null) {
-                    Transaction transToSave = e.getTransaction();
+                Transaction transToSave = e.getTransaction();
+                if (transToSave != null) {
                     Asset assetToSave = e.getAsset();
                     try {
-                        if (assetToSave != null) {
-                            transController.save(transToSave);
-
+                        assetController.save(assetToSave);
+                        if (assetToSave.getId() == null) {
+                            Integer assetToSaveId = assetController.findLatest();
+                            assetToSave.setId(assetToSaveId);
+                            contentPanel.getInventoryPanel().getEquipmentPanel().insertToTable(assetToSave);
+                            transToSave.setAssetId(assetToSaveId);
                         } else {
-                            assetController.save(assetToSave);
-                            Integer savedAssetId = assetController.findLatest();
-                            transToSave.setAssetId(savedAssetId);
-                            transController.save(transToSave);
+                            List<Asset> assets = assetController.findAllEquipment();
+                            contentPanel.getInventoryPanel().getEquipmentPanel().updateAssetsInModel(assets);
                         }
+                        transController.save(transToSave);
 
+                        if (transToSave.getId() == null) {
+                            Integer id = transController.findLatest();
+                            transToSave.setId(id);
+                            contentPanel.getExpenseTablePanel().insertToTable(transToSave);
+                        } else {
+                            List<Transaction> trans = transController.findAllExpense();
+                            contentPanel.getExpenseTablePanel().refresh(trans);
+                        }
                     } catch (SQLException ex) {
-                        System.out.println(ex.getMessage());
-
+                        Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    CardLayout cl = (CardLayout) contentPanel.getLayout();
-                    cl.show(contentPanel, "expenseTablePanel");
                 }
+                CardLayout cl = (CardLayout) contentPanel.getLayout();
+                cl.show(contentPanel, "expenseTablePanel");
             }
         });
     }
@@ -222,10 +252,10 @@ public class MainFrame extends JFrame {
                 List<Period> periods = null;
                 List<Asset> products = null;
                 try {
-                    periods = periodController.findAllPeriods();
+                    periods = periodController.findBeforeADate(YearMonth.now().plusMonths(2));
                     products = assetController.findAllProducts();
                 } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
+                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
                 contentPanel.getIncomeFormPanel().setUpComboBoxesAndTitle(periods, products);
@@ -253,18 +283,18 @@ public class MainFrame extends JFrame {
                 List<Period> periods = null;
                 List<Asset> equipment = null;
                 try {
-                    periods = periodController.findAllPeriods();
+                    periods = periodController.findBeforeADate(YearMonth.now().plusMonths(2));
                     equipment = assetController.findAllEquipment();
                 } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
+                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-                contentPanel.getIncomeFormPanel().setUpComboBoxesAndTitle(periods, equipment);
-                cl.show(contentPanel, "incomeFormPanel");
+                contentPanel.getExpenseFormPanel().setUpComboBoxesAndTitle(periods, equipment);
+                cl.show(contentPanel, "expenseFormPanel");
                 if (tempTransaction == null) {
-                    contentPanel.getIncomeFormPanel().setUpForNew();
+                    contentPanel.getExpenseFormPanel().setUpForNew();
                 } else {
-                    contentPanel.getIncomeFormPanel().setUpForUpdate(tempAsset,
+                    contentPanel.getExpenseFormPanel().setUpForUpdate(tempAsset,
                             tempPeriod, tempTransaction);
                 }
             }
@@ -276,16 +306,14 @@ public class MainFrame extends JFrame {
 
             @Override
             public void formEventOccured(FormEvent e) {
-                Transaction tempTransaction = e.getTransaction();
-                Integer id = tempTransaction.getId();
-                int row = e.getRow();
+                Asset asset = e.getAsset();
                 try {
-                    boolean delete = transController.delete(id);
-                    if (delete) {
-                        contentPanel.getIncomeTablePanel().deleteFromTable(row);
-                    }
+                    assetController.save(asset);
+                    List<Asset> assets = assetController.findAllProducts();
+                    contentPanel.getInventoryPanel().getProductPanel().updateAssetsInModel(assets);
+
                 } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
+                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
             }
@@ -297,16 +325,13 @@ public class MainFrame extends JFrame {
 
             @Override
             public void formEventOccured(FormEvent e) {
-                Transaction tempTransaction = e.getTransaction();
-                Integer id = tempTransaction.getId();
-                int row = e.getRow();
+                Asset asset = e.getAsset();
                 try {
-                    boolean delete = transController.delete(id);
-                    if (delete) {
-                        contentPanel.getIncomeTablePanel().deleteFromTable(row);
-                    }
+                    assetController.save(asset);
+                    List<Asset> assets = assetController.findAllEquipment();
+                    contentPanel.getInventoryPanel().getEquipmentPanel().updateAssetsInModel(assets);
                 } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
+                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
             }
@@ -339,20 +364,29 @@ public class MainFrame extends JFrame {
             periods = periodController
                     .findAfterADate(YearMonth.now().minusMonths(1));
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
         contentPanel.getGoalFormPanel().setPeriods(periods);
     }
 
+    private void inventoryBtnActionPerformed(ActionEvent evt) {
+        CardLayout cl = (CardLayout) contentPanel.getLayout();
+        cl.show(contentPanel, "inventoryPanel");
+    }
+
     private void initComponents() {
         contentPanel = new ContentPanel(assetController, periodController, transController);
-        dataLabel = new JLabel("Data");
+        dataLabel = new JLabel("Transactions");
         dataLabel.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14));
         dataLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         goalLabel = new JLabel("Goals");
         goalLabel.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14));
         goalLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        inventoryLabel = new JLabel("Inventory");
+        inventoryLabel.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 14));
+        inventoryLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         incomeBtn = new JButton("Income");
         incomeBtn.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 11));
@@ -398,6 +432,17 @@ public class MainFrame extends JFrame {
             }
         });
 
+        inventoryBtn = new JButton("Show");
+        inventoryBtn.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 11));
+        inventoryBtn.setHorizontalAlignment(SwingConstants.CENTER);
+        inventoryBtn.setPreferredSize(new Dimension(90, 30));
+        inventoryBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                inventoryBtnActionPerformed(evt);
+            }
+        });
+
         menuPanel = new JPanel();
         menuPanel.setPreferredSize(new Dimension(110, 600));
         menuPanel.setBackground(new Color(0, 204, 172));
@@ -430,6 +475,13 @@ public class MainFrame extends JFrame {
         gc.gridy++;
         gc.insets = btnInsets;
         menuPanel.add(goalBtn, gc);
+        gc.gridy++;
+        gc.insets = new Insets(20, 0, 20, 0);
+        menuPanel.add(inventoryLabel, gc);
+        gc.gridy++;
+        gc.insets = btnInsets;
+        menuPanel.add(inventoryBtn, gc);
+
     }
 
     /**

@@ -61,11 +61,12 @@ public class PeriodDAOImpl implements PeriodRepository {
     @Override
     public Period findById(Integer id) throws SQLException {
         findById.setInt(1, id);
-        Period period;
+        Period period = null;
         try (ResultSet periodById = findById.executeQuery()) {
             periodById.beforeFirst();
-            periodById.next();
-            period = makeOne(periodById);
+            if (periodById.next()) {
+                period = makeOne(periodById);
+            }
         }
         return period;
     }
@@ -74,11 +75,12 @@ public class PeriodDAOImpl implements PeriodRepository {
     public Period findByDate(YearMonth yearMonth) throws SQLException {
         findByDate.setInt(1, yearMonth.getYear());
         findByDate.setInt(2, yearMonth.getMonthValue());
-        Period period;
+        Period period = null;
         try (ResultSet periodByDate = findByDate.executeQuery()) {
             periodByDate.beforeFirst();
-            periodByDate.next();
-            period = makeOne(periodByDate);
+            if (periodByDate.next()) {
+                period = makeOne(periodByDate);
+            }
         }
         return period;
     }
@@ -87,34 +89,43 @@ public class PeriodDAOImpl implements PeriodRepository {
     public List<Period> findAfter(YearMonth date) throws SQLException {
         List<Period> periods;
         Period comparePeriod = findByDate(date);
-        Integer compareId = comparePeriod.getId();
-        findAfter.setInt(1, compareId);
-        try (ResultSet periodsAfterADate = findAfter.executeQuery()) {
-            periods = makeList(periodsAfterADate);
+        if (comparePeriod != null) {
+            Integer compareId = comparePeriod.getId();
+            findAfter.setInt(1, compareId);
+            try (ResultSet periodsAfterADate = findAfter.executeQuery()) {
+                periods = makeList(periodsAfterADate);
+            }
+            return periods;
         }
-        return periods;
+        return new ArrayList<>();
+
     }
-    
+
     @Override
     public List<Period> findBefore(YearMonth date) throws SQLException {
         List<Period> periods;
         Period comparePeriod = findByDate(date);
-        Integer compareId = comparePeriod.getId();
-        findBefore.setInt(1, compareId);
-        try (ResultSet periodsBeforeADate = findBefore.executeQuery()) {
-            periods = makeList(periodsBeforeADate);
+        if (comparePeriod != null) {
+            Integer compareId = comparePeriod.getId();
+            findBefore.setInt(1, compareId);
+            try (ResultSet periodsBeforeADate = findBefore.executeQuery()) {
+                periods = makeList(periodsBeforeADate);
+            }
+            return periods;
         }
-        return periods;
+        return new ArrayList<>();
+
     }
 
     @Override
     public Period findLatest() throws SQLException {
         Integer id;
-        Period period;
+        Period period = null;
         try (ResultSet latestPeriod = findLatest.executeQuery()) {
             latestPeriod.beforeFirst();
-            latestPeriod.next();
-            period = makeOne(latestPeriod);
+            if (latestPeriod.next()) {
+                period = makeOne(latestPeriod);
+            }
         }
         return period;
     }

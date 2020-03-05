@@ -56,15 +56,16 @@ public class SummaryTablePanel extends JPanel implements ItemListener {
     private final String[] EXPORT_COMBO_OPTIONS = {"Export", "csv", "pdf"};
 
     /**
-     * Constructs a SummaryTablePanel with specified <code>AssetController</code>,
-     * <code>PeriodController</code> and <code>TransactionController</code>.
+     * Constructs a SummaryTablePanel with specified
+     * <code>AssetController</code>, <code>PeriodController</code> and
+     * <code>TransactionController</code>.
      *
-     * @param assetController An <code>AssetController</code> object to create a connection
-     * with the <code>AssetRepository</code>.
-     * @param perController A <code>PeriodController</code> object to create a connection
-     * with the <code>PeriodRepository</code>.
-     * @param transController A <code>TransactionController</code> object to create a
-     * connection with the <code>TransactionRepository</code>.
+     * @param assetController An <code>AssetController</code> object to create a
+     * connection with the <code>AssetRepository</code>.
+     * @param perController A <code>PeriodController</code> object to create a
+     * connection with the <code>PeriodRepository</code>.
+     * @param transController A <code>TransactionController</code> object to
+     * create a connection with the <code>TransactionRepository</code>.
      */
     public SummaryTablePanel(AssetController assetController,
             PeriodController perController, TransactionController transController) {
@@ -84,7 +85,7 @@ public class SummaryTablePanel extends JPanel implements ItemListener {
         title = new JLabel("Summary");
         title.setFont(new Font("Lucida Sans Unicode", 0, 22));
         title.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
-        
+
         exportCombo = new JComboBox(EXPORT_COMBO_OPTIONS);
         exportCombo.addItemListener(this);
 
@@ -150,11 +151,13 @@ public class SummaryTablePanel extends JPanel implements ItemListener {
     }
 
     /**
-     * Invokes the fireTableDataChanged method of the
-     * <code>SummaryTableModel</code>.
+     * Invokes the setData method of the <code>SummaryTableModel</code>.
+     *
+     * @param periods A List of <code>Period</code> objects to show in the
+     * table.
      */
-    public void refresh() {
-        tableModel.fireTableDataChanged();
+    public void refresh(List<Period> periods) {
+        tableModel.setData(periods);
     }
 
     @Override

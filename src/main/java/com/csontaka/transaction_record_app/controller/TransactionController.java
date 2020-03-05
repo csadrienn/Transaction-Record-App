@@ -50,6 +50,18 @@ public class TransactionController {
     public List<Transaction> findByPeriodId(Integer periodId) throws SQLException {
         return daoImpl.findByPeriodId(periodId);
     }
+    
+    /**
+     * Invokes the findByAssetId method of the
+     * <code>TransactionRepository</code>.
+     *
+     * @param assetId An Integer containing the assetId in a Transaction object.
+     * @return A List of Transaction object.
+     * @throws SQLException If an SQL exception occurs.
+     */
+    public List<Transaction> findByAssetId(Integer assetId) throws SQLException {
+       return daoImpl.findByAssetId(assetId);
+    }
 
     /**
      * Invokes the findAllIncome method of the
@@ -71,6 +83,17 @@ public class TransactionController {
      */
     public List<Transaction> findAllExpense() throws SQLException {
         return daoImpl.findAllExpense();
+    }
+    
+    /**
+     * Invokes the findLatest method of the
+     * <code>TransactionRepository</code>.
+     *
+     * @return An Integer representing the the id of the last saved transaction.
+     * @throws SQLException If an SQL exception occurs.
+     */
+    public Integer findLatest() throws SQLException{
+        return daoImpl.findLatest();
     }
 
     /**
@@ -97,6 +120,17 @@ public class TransactionController {
         return daoImpl.delete(id);
     }
 
+    /**Invokes the findById method of the
+     * <code>TransactionRepository</code>.
+     *
+     * @param id Integer containing the transaction's id.
+     * @return A <code>Transaction</code> object 
+     * @throws SQLException
+     */
+    public Transaction findById(Integer id) throws SQLException {
+        return daoImpl.findById(id);
+    }
+    
     /**
      * Invokes the close method of the
      * <code>TransactionRepository</code>.
@@ -106,5 +140,9 @@ public class TransactionController {
     public void close() throws SQLException {
         daoImpl.close();
     }
+
+    
+
+    
 
 }

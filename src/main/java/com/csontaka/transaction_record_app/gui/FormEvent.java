@@ -6,8 +6,8 @@ import com.csontaka.transaction_record_app.entity.Transaction;
 import java.util.EventObject;
 
 /**
- * Stores an <code>Asset</code>, a <code>Product</code>, a <code>Transaction</code>
- * and an int for a row. Helps the data transfer between panels.
+ * Stores an <code>Asset</code>, a <code>Product</code> and a <code>Transaction</code>. 
+ * Helps the data transfer between panels.
  *
  * @author Adrienn Csontak
  */
@@ -16,7 +16,6 @@ class FormEvent extends EventObject {
     private Transaction transaction;
     private Asset asset;
     private Period period;
-    private int row;
 
     /**
      * Default constructor calling the parent class constructor with a specified
@@ -96,23 +95,4 @@ class FormEvent extends EventObject {
     public void setPeriod(Period period) {
         this.period = period;
     }
-
-    /**
-     * Gets the row of a table stored in the form event.
-     *
-     * @return An int representing a row of a table.
-     */
-    public int getRow() {
-        return row;
-    }
-
-    /**
-     * Sets the row of a table to be stored in the form event.
-     *
-     * @param row An int containing the row of a table.
-     */
-    public void setRow(int row) {
-        this.row = row;
-    }
-
 }

@@ -26,6 +26,8 @@ import java.text.NumberFormat;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -45,7 +47,8 @@ import javax.swing.table.TableRowSorter;
 /**
  * Contains a JTable to display information about transactions and buttons to
  * delete transactions and to redirect to the transaction form to save or update
- * transactions. Implements the ItemListener interface itemStateChanged method.
+ * transactions. Implements the <code>ItemListener</code> interface
+ * itemStateChanged method.
  *
  * @author Adrienn Csontak
  */
@@ -76,17 +79,18 @@ public class TransactionTablePanel extends JPanel implements ItemListener {
     private final String[] EXPORT_COMBO_OPTIONS = {"Export", "csv", "pdf"};
 
     /**
-     * Constructs a SummaryTablePanel with specified <code>AssetController</code>,
-     * <code>PeriodController</code>, <code>TransactionController</code> and 
-     * <code>AssetType</code> objects.
+     * Constructs a SummaryTablePanel with specified
+     * <code>AssetController</code>, <code>PeriodController</code>,
+     * <code>TransactionController</code> and <code>AssetType</code> objects.
      *
-     * @param assetController An <code>AssetController</code> object to create a connection
-     * with the <code>AssetRepository</code>.
-     * @param perController A <code>PeriodController</code> object to create a connection
-     * with the <code>PeriodRepository</code>.
-     * @param transController A <code>TransactionController</code> object to create a
-     * connection with the <code>TransactionRepository</code>.
-     * @param assetType The <code>AssetType</code>s enum that define the type of assets.
+     * @param assetController An <code>AssetController</code> object to create a
+     * connection with the <code>AssetRepository</code>.
+     * @param perController A <code>PeriodController</code> object to create a
+     * connection with the <code>PeriodRepository</code>.
+     * @param transController A <code>TransactionController</code> object to
+     * create a connection with the <code>TransactionRepository</code>.
+     * @param assetType The <code>AssetType</code>s enum that defines the type
+     * of assets.
      */
     public TransactionTablePanel(AssetController assetController,
             PeriodController perController,
@@ -151,7 +155,7 @@ public class TransactionTablePanel extends JPanel implements ItemListener {
         exportCombo = new JComboBox(EXPORT_COMBO_OPTIONS);
         exportCombo.setSelectedIndex(0);
         exportCombo.addItemListener(this);
-        
+
         tableModel = new TransactionTableModel(trans,
                 assetController, perController);
         sorter = new TableRowSorter<>(tableModel);
@@ -201,11 +205,11 @@ public class TransactionTablePanel extends JPanel implements ItemListener {
         gc.anchor = GridBagConstraints.CENTER;
         gc.insets = new Insets(10, 0, 0, 0);
         titlePanel.add(title, gc);
-        
+
         JPanel panel = new JPanel(new FlowLayout());
         panel.add(timeCombo);
         panel.add(exportCombo);
-        
+
         gc.gridy = 1;
         gc.weightx = 1;
         gc.anchor = GridBagConstraints.FIRST_LINE_START;
@@ -214,28 +218,32 @@ public class TransactionTablePanel extends JPanel implements ItemListener {
     }
 
     /**
-     * Invokes the fireTableDataChanged method of the
-     * {@link com.csontaka.transaction_record_app.gui.TransactionTableModel}.
+     * Invokes the updateTransactions method of the
+     * <code>TransactionTableModel</code>.
+     *
+     * @param trans A List of <code>Transaction</code> object to refresh the
+     * table with.
      */
-    public void refresh() {
-        tableModel.fireTableDataChanged();
+    public void refresh(List<Transaction> trans) {
+        tableModel.updateTransactions(trans);
     }
 
     /**
-     * Invokes the fireTableRowsDeleted method of the
-     * {@link com.csontaka.transaction_record_app.gui.TransactionTableModel}.
+     * Invokes the deleteFromModel method of the
+     * <code>TransactionTableModel</code>.
      *
-     * @param row An int containing the index of the deleted row.
+     * @param transaction An <code>Transaction</code> object to delete.
      */
-    public void deleteFromTable(int row) {
-        tableModel.fireTableRowsDeleted(row, row);
+    private void deleteFromTable(Transaction transaction) {
+        tableModel.deleteFromModel(transaction);
     }
 
     /**
      * Invokes the addTransaction method of the
-     * {@link com.csontaka.transaction_record_app.gui.TransactionTableModel}.
+     * <code>TransactionTableModel</code>.
      *
-     * @param transaction The Transaction object to insert to the table.
+     * @param transaction The <code>Transaction</code> object to insert to the
+     * table.
      */
     public void insertToTable(Transaction transaction) {
         tableModel.addTransaction(transaction);
@@ -309,17 +317,31 @@ public class TransactionTablePanel extends JPanel implements ItemListener {
                     int deleteConfirm = JOptionPane.showConfirmDialog(getRootPane(),
                             "Are you sure you want to delete this item?", "Confirm delete", JOptionPane.OK_CANCEL_OPTION);
                     if (deleteConfirm == JOptionPane.OK_OPTION) {
-                        FormEvent event = getSelectedRowValues(row);
-                        event.setRow(row);
+                        Integer transId = (Integer) table.getValueAt(row, 0);
+                        Asset asset = new Asset();
+                        try {
+                            Transaction trans = transController.findById(transId);
+                            boolean success = transController.delete(transId);
+                            if (success) {
+                                deleteFromTable(trans);
+                                Integer assetId = trans.getAssetId();
+                                asset = assetController.findById(assetId);
+                                asset.setId(assetId);
+                                asset.setStock(asset.getStock() + trans.getAmount());
+                            }
+                        } catch (SQLException ex) {
+                            Logger.getLogger(TransactionTablePanel.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+
+                        FormEvent event = new FormEvent(this);
+                        event.setAsset(asset);
                         if (deleteFormListener != null) {
                             deleteFormListener.formEventOccured(event);
-
                         }
                     }
                 }
             }
         });
-
     }
 
     private void showWarning() {
@@ -333,7 +355,6 @@ public class TransactionTablePanel extends JPanel implements ItemListener {
 
         Integer transId = (Integer) table.getModel().getValueAt(row, 0);
         YearMonth date = (YearMonth) table.getModel().getValueAt(row, 1);
-
         String assetNameAndId = (String) table.getModel().getValueAt(row, 2);
         int idStart = assetNameAndId.indexOf("(") + 1;
         String assetName = assetNameAndId.substring(0, idStart - 1);
@@ -368,48 +389,48 @@ public class TransactionTablePanel extends JPanel implements ItemListener {
             if (e.getSource() == timeCombo) {
                 doTimeComboEvent();
             }
-            if(e.getSource() == exportCombo){
+            if (e.getSource() == exportCombo) {
                 doExportComboEvent();
             }
         }
 
     }
 
-    private void doTimeComboEvent(){
+    private void doTimeComboEvent() {
         YearMonth now = YearMonth.now();
-                YearMonth startDate = null;
-                int index = timeCombo.getSelectedIndex();
-                String regex = null;
+        YearMonth startDate = null;
+        int index = timeCombo.getSelectedIndex();
+        String regex = null;
 
-                switch (index) {
-                    case 1:
-                        startDate = now.minusYears(1).minusMonths(1);
-                        newFilter(startDate);
-                        break;
-                    case 2:
-                        startDate = now.minusMonths(7);
-                        newFilter(startDate);
-                        break;
-                    case 3:
-                        startDate = now.minusMonths(4);
-                        newFilter(startDate);
-                        break;
-                    case 4:
-                        startDate = now.minusMonths(3);
-                        newFilter(startDate);
-                        break;
-                    case 5:
-                        startDate = now.minusMonths(1);
-                        newFilter(startDate);
-                        break;
+        switch (index) {
+            case 1:
+                startDate = now.minusYears(1).minusMonths(1);
+                newFilter(startDate);
+                break;
+            case 2:
+                startDate = now.minusMonths(7);
+                newFilter(startDate);
+                break;
+            case 3:
+                startDate = now.minusMonths(4);
+                newFilter(startDate);
+                break;
+            case 4:
+                startDate = now.minusMonths(3);
+                newFilter(startDate);
+                break;
+            case 5:
+                startDate = now.minusMonths(1);
+                newFilter(startDate);
+                break;
 
-                    default:
-                        noFilter();
-                }
+            default:
+                noFilter();
+        }
     }
+
     private void doExportComboEvent() {
         String choosen = (String) exportCombo.getSelectedItem();
-        System.out.println("choosen: " + choosen);
         choosen = choosen.toLowerCase();
 
         if (!choosen.equalsIgnoreCase(EXPORT_COMBO_OPTIONS[0])) {
@@ -456,7 +477,6 @@ public class TransactionTablePanel extends JPanel implements ItemListener {
                 String fileName = file.getName();
                 String path = file.getAbsolutePath();
                 if (!fileName.endsWith(extension)) {
-                    fileName += extension;
                     file = new File(path + extension);
                 }
             }
