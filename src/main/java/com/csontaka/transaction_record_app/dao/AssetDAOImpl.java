@@ -40,10 +40,10 @@ public class AssetDAOImpl implements AssetRepository {
         findAllEquipment = conn.prepareStatement("SELECT * FROM transaction_records.assets WHERE type = 0");
         findById = conn.prepareStatement("SELECT * FROM transaction_records.assets WHERE id = ?");
         findLatest = conn.prepareStatement("SELECT MAX(id) as id FROM assets");
-        addAsset = conn.prepareStatement("INSERT INTO assets (name, feature, type, stock, planned_price) "
+        addAsset = conn.prepareStatement("INSERT INTO assets (name, feature, type, stock, material_cost) "
                 + "VALUES( ?,  ?,  ?, ?, ?)");
         updateAsset = conn.prepareStatement("UPDATE assets SET "
-                + "name = ?, feature = ?, type = ?, stock = ?, planned_price = ? WHERE id = ?");
+                + "name = ?, feature = ?, type = ?, stock = ?, material_cost = ? WHERE id = ?");
         deleteAsset = conn.prepareStatement("DELETE FROM assets WHERE id = ?");
     }
 
@@ -119,7 +119,7 @@ public class AssetDAOImpl implements AssetRepository {
             }
             addAsset.setInt(3, typeNum);
             addAsset.setInt(4, asset.getStock());
-            addAsset.setInt(5, asset.getPlannedPrice());
+            addAsset.setInt(5, asset.getMaterialCost());
             addAsset.executeUpdate();
         }
     }
@@ -134,7 +134,7 @@ public class AssetDAOImpl implements AssetRepository {
         updateAsset.setString(2, asset.getFeature());
         updateAsset.setInt(3, typeNum);
         updateAsset.setInt(4, asset.getStock());
-        updateAsset.setInt(5, asset.getPlannedPrice());
+        updateAsset.setInt(5, asset.getMaterialCost());
         updateAsset.setInt(6, asset.getId());
         updateAsset.executeUpdate();
     }
@@ -180,11 +180,11 @@ public class AssetDAOImpl implements AssetRepository {
             type = AssetType.PRODUCT;
         }
         int stock = rs.getInt("stock");
-        int plannedPrice = rs.getInt("planned_price");
+        int materialCost = rs.getInt("material_cost");
         Asset asset = new Asset(assetName, feature, type);
         asset.setId(id);
         asset.setStock(stock);
-        asset.setPlannedPrice(plannedPrice);
+        asset.setMaterialCost(materialCost);
         return asset;
     }
 }

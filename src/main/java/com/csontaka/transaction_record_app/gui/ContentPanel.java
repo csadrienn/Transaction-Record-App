@@ -23,6 +23,7 @@ public class ContentPanel extends JPanel {
     private TransactionFormPanel incomeFormPanel;
     private TransactionFormPanel expenseFormPanel;
     private InventoryPanel inventoryPanel;
+    private PriceCalculatorPanel calculatorPanel;
 
     private AssetController assetController;
     private PeriodController perController;
@@ -32,12 +33,12 @@ public class ContentPanel extends JPanel {
      * Creates a ContentPanel with the specified <code>AssetController</code>,
      * <code>PeriodController</code> and <code>TransactionController</code>.
      *
-     * @param assetController An <code>AssetController</code> object to create a connection
-     * with the <code>AssetRepository</code>.
-     * @param perController A <code>PeriodController</code> object to create a connection
-     * with the <code>PeriodRepository</code>.
-     * @param transController A <code>TransactionController</code> object to create a
-     * connection with the <code>TransactionRepository</code>.
+     * @param assetController An <code>AssetController</code> object to create a
+     * connection with the <code>AssetRepository</code>.
+     * @param perController A <code>PeriodController</code> object to create a
+     * connection with the <code>PeriodRepository</code>.
+     * @param transController A <code>TransactionController</code> object to
+     * create a connection with the <code>TransactionRepository</code>.
      */
     public ContentPanel(AssetController assetController, PeriodController perController, TransactionController transController) {
         this.assetController = assetController;
@@ -54,9 +55,10 @@ public class ContentPanel extends JPanel {
         incomeFormPanel = new TransactionFormPanel(AssetType.PRODUCT);
         expenseFormPanel = new TransactionFormPanel(AssetType.EQUIPMENT);
         inventoryPanel = new InventoryPanel(assetController, transController);
+        calculatorPanel = new PriceCalculatorPanel(assetController);
 
         setLayout(new CardLayout());
-        
+
         add("incomeFormPanel", incomeFormPanel);
         add("expenseFormPanel", expenseFormPanel);
         add("summaryTablePanel", summaryTablePanel);
@@ -64,7 +66,8 @@ public class ContentPanel extends JPanel {
         add("expenseTablePanel", expenseTablePanel);
         add("goalFormPanel", goalFormPanel);
         add("inventoryPanel", inventoryPanel);
-        
+        add("calculatorPanel", calculatorPanel);
+
     }
 
     /**
@@ -138,12 +141,32 @@ public class ContentPanel extends JPanel {
         goalFormPanel.setPeriods(periods);
     }
 
-    /**Gets the content panel's InventoryPanel object that display a form
-     * for saving or updating incomes.
+    /**
+     * Gets the content panel's InventoryPanel object that display a form for
+     * saving or updating incomes.
      *
      * @return An InventoryPanel object.
      */
     public InventoryPanel getInventoryPanel() {
         return inventoryPanel;
+    }
+
+    /**
+     * Gets the content panel's PriceCalculatorPanel object that display a form
+     * for calculating a price for a product.
+     *
+     * @return A getPriceCalculatorPanel object.
+     */
+    public PriceCalculatorPanel getPriceCalculatorPanel() {
+        return calculatorPanel;
+    }
+
+    /**
+     * Clears the fields in the AssetPanel objects.
+     *
+     */
+    public void clearAssetPanels() {
+        inventoryPanel.getProductPanel().clearTextAndSelection();
+        inventoryPanel.getEquipmentPanel().clearTextAndSelection();
     }
 }

@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
+import javax.swing.border.Border;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.TableRowSorter;
@@ -82,8 +83,9 @@ public class SummaryTablePanel extends JPanel implements ItemListener {
         setLayout(new BorderLayout());
 
         titlePanel = new JPanel(new GridBagLayout());
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
         title = new JLabel("Summary");
-        title.setFont(new Font("Lucida Sans Unicode", 0, 22));
+        title.setFont(new Font("Lucida Sans Unicode", 0, 24));
         title.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
 
         exportCombo = new JComboBox(EXPORT_COMBO_OPTIONS);
@@ -103,7 +105,9 @@ public class SummaryTablePanel extends JPanel implements ItemListener {
         newFilter(YearMonth.now().minusMonths(4));
 
         JScrollPane scrollpane = new JScrollPane(table);
-        scrollpane.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        Border empty = BorderFactory.createEmptyBorder(0, 17, 10, 17);
+        Border etched = BorderFactory.createEtchedBorder();
+        scrollpane.setBorder(BorderFactory.createCompoundBorder(empty, etched));
 
         JPanel panel = new JPanel(new FlowLayout());
         panel.add(timeCombo);
@@ -112,12 +116,11 @@ public class SummaryTablePanel extends JPanel implements ItemListener {
         GridBagConstraints gc = new GridBagConstraints();
         gc.gridy = 0;
         gc.anchor = GridBagConstraints.CENTER;
-        gc.insets = new Insets(10, 0, 0, 0);
         titlePanel.add(title, gc);
         gc.gridy = 1;
         gc.weightx = 1;
         gc.anchor = GridBagConstraints.FIRST_LINE_START;
-        gc.insets = new Insets(30, 13, 0, 0);
+        gc.insets = new Insets(20, 13, 0, 0);
         titlePanel.add(panel, gc);
 
         add(titlePanel, BorderLayout.NORTH);

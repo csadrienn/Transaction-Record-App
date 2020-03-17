@@ -12,7 +12,7 @@ public class Asset {
     private String feature;
     private AssetType type;
     private int stock;
-    private int plannedPrice;
+    private int materialCost;
 
     /**
      * Default constructor to create an Asset.
@@ -127,23 +127,23 @@ public class Asset {
     }
 
     /**
-     * Gets the asset’s planned sales price or the general purchase price.
+     * Gets the asset's cost of production or the general purchase price.
      *
-     * @return An int representing asset's planned sales price or the general
-     * purchase price;
+     * @return An int representing the asset's cost of production or the
+     * general purchase price;
      */
-    public int getPlannedPrice() {
-        return plannedPrice;
+    public int getMaterialCost() {
+        return materialCost;
     }
 
     /**
-     * Sets the asset’s planned sales price or the general purchase price.
+     * Sets the asset's cost of production or the general purchase price.
      *
-     * @param plannedPrice An int containing asset's planned sales price or the
+     * @param materialCost An int containing the asset's cost of production or the
      * general purchase price;
      */
-    public void setPlannedPrice(int plannedPrice) {
-        this.plannedPrice = plannedPrice;
+    public void setMaterialCost(int materialCost) {
+        this.materialCost = materialCost;
     }
 
 }

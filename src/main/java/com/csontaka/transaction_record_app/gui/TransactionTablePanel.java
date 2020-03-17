@@ -1,15 +1,12 @@
 package com.csontaka.transaction_record_app.gui;
 
-import com.csontaka.transaction_record_app.controller.AssetController;
-import com.csontaka.transaction_record_app.controller.PeriodController;
-import com.csontaka.transaction_record_app.controller.TransactionController;
-import com.csontaka.transaction_record_app.entity.Asset;
-import com.csontaka.transaction_record_app.entity.AssetType;
-import com.csontaka.transaction_record_app.entity.Period;
-import com.csontaka.transaction_record_app.entity.Transaction;
+import com.csontaka.transaction_record_app.controller.*;
+import com.csontaka.transaction_record_app.entity.*;
 import com.csontaka.transaction_record_app.exporting.TableExport;
 import com.csontaka.transaction_record_app.exporting.ExportFactory;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -29,6 +26,7 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -37,6 +35,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
@@ -72,6 +71,8 @@ public class TransactionTablePanel extends JPanel implements ItemListener {
     private FormListener deleteFormListener;
     private JComboBox timeCombo;
     private JComboBox exportCombo;
+    private JTextField searchField;
+    private JButton searchBtn;
     private final Locale LOCALE = new Locale("en", "UK");
     private final DecimalFormat DECIMAL_FORMAT = (DecimalFormat) NumberFormat.getNumberInstance(LOCALE);
     private final String[] TIME_COMBO_OPTIONS = {"all", "past 1 year",
@@ -117,7 +118,7 @@ public class TransactionTablePanel extends JPanel implements ItemListener {
         setUpComponents(trans);
     }
 
-    private void newFilter(YearMonth startDate) {
+    private void newDateFilter(YearMonth startDate) {
         RowFilter<TransactionTableModel, Integer> dateFilter = new RowFilter<TransactionTableModel, Integer>() {
             @Override
             public boolean include(RowFilter.Entry<? extends TransactionTableModel, ? extends Integer> entry) {
@@ -125,6 +126,27 @@ public class TransactionTablePanel extends JPanel implements ItemListener {
                 int i = entry.getIdentifier();
                 YearMonth ym = (YearMonth) tableModel.getValueAt(i, 1);
                 if (ym.isAfter(startDate)) {
+                    return true;
+                }
+                return false;
+            }
+        };
+        sorter.setRowFilter(dateFilter);
+    }
+
+    private void newSearchFilter(String pattern) {
+        RowFilter<TransactionTableModel, Integer> dateFilter = new RowFilter<TransactionTableModel, Integer>() {
+            @Override
+            public boolean include(RowFilter.Entry<? extends TransactionTableModel, ? extends Integer> entry) {
+                TransactionTableModel tableModel = entry.getModel();
+                int i = entry.getIdentifier();
+                String id = tableModel.getValueAt(i, 0).toString();
+                String date = tableModel.getValueAt(i, 1).toString();
+                String name = (String) tableModel.getValueAt(i, 2);
+                String price = tableModel.getValueAt(i, 3).toString();
+                String amount = tableModel.getValueAt(i, 4).toString();
+                if (id.contains(pattern) || date.contains(pattern) || name.contains(pattern)
+                        || price.contains(pattern) || amount.contains(pattern)) {
                     return true;
                 }
                 return false;
@@ -144,36 +166,76 @@ public class TransactionTablePanel extends JPanel implements ItemListener {
     }
 
     private void setUpComponents(List<Transaction> trans) {
+        Font lucida14 = new Font("Lucida Sans Unicode", 0, 14);
+
         title = new JLabel("");
-        title.setFont(new Font("Lucida Sans Unicode", 0, 22));
+        title.setFont(new Font("Lucida Sans Unicode", 0, 24));
         title.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         title.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
+
         timeCombo = new JComboBox(TIME_COMBO_OPTIONS);
         timeCombo.setSelectedIndex(5);
+        timeCombo.setPreferredSize(new Dimension(110, 26));
         timeCombo.addItemListener(this);
 
         exportCombo = new JComboBox(EXPORT_COMBO_OPTIONS);
+        exportCombo.setPreferredSize(new Dimension(65, 26));
         exportCombo.setSelectedIndex(0);
         exportCombo.addItemListener(this);
+
+        searchField = new JTextField(10);
+        searchField.setFont(lucida14);
+        searchField.setBorder(null);
+        searchBtn = new JButton(Utils.createIcon("/images/search20.png"));
+        searchBtn.setPreferredSize(new Dimension(24, 24));
+
+        searchBtn.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, new Color(112, 128, 160)));
+        searchBtn.setBackground(Color.LIGHT_GRAY);
 
         tableModel = new TransactionTableModel(trans,
                 assetController, perController);
         sorter = new TableRowSorter<>(tableModel);
         table = new JTable(tableModel);
         table.setRowSorter(sorter);
-        newFilter(YearMonth.now().minusMonths(1));
+        newDateFilter(YearMonth.now().minusMonths(1));
         table.getColumnModel().getColumn(0).setMaxWidth(50);
         table.getColumnModel().getColumn(2).setMinWidth(120);
 
         JScrollPane scrollpane = new JScrollPane(table);
-        scrollpane.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        addBtn = new JButton("Insert");
-        addBtn.setFont(new Font("Lucida Sans Unicode", 0, 14));
-        updateBtn = new JButton("Update");
-        updateBtn.setFont(new Font("Lucida Sans Unicode", 0, 14));
-        deleteBtn = new JButton("Delete");
-        deleteBtn.setFont(new Font("Lucida Sans Unicode", 0, 14));
+        Border empty = BorderFactory.createEmptyBorder(0, 17, 0, 17);
+        Border etched = BorderFactory.createEtchedBorder();
+        scrollpane.setBorder(BorderFactory.createCompoundBorder(empty, etched));
+
+        Icon addIcon = Utils.createIcon("/images/add25.png");
+        if (addIcon != null) {
+            addBtn = new JButton(addIcon);
+        } else {
+            addBtn = new JButton("Insert");
+        }
+        Utils.setButtonLook(addBtn, Color.GREEN.darker(),14);
+        addBtn.setPreferredSize(new Dimension(85, 33));
+        addBtn.setToolTipText("Insert a new transaction.");
+
+        Icon updateIcon = Utils.createIcon("/images/edit25.png");
+        if (updateIcon != null) {
+            updateBtn = new JButton(updateIcon);
+        } else {
+            updateBtn = new JButton("Update");
+        }
+        Utils.setButtonLook(updateBtn, Color.YELLOW.darker(), 14);
+        updateBtn.setPreferredSize(new Dimension(85, 33));
+        updateBtn.setToolTipText("Update the transaction.");
+
+        Icon deleteIcon = Utils.createIcon("/images/delete25.png");
+        if (deleteIcon != null) {
+            deleteBtn = new JButton(deleteIcon);
+        } else {
+            deleteBtn = new JButton("Delete");
+        }
+        Utils.setButtonLook(deleteBtn, Color.RED.darker(), 14);
+        deleteBtn.setPreferredSize(new Dimension(85, 33));
+        deleteBtn.setToolTipText("Delete the transaction.");
 
         addActionListenerToBtns();
 
@@ -188,33 +250,40 @@ public class TransactionTablePanel extends JPanel implements ItemListener {
 
     private void setUpButtonPanel() {
         buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 20));
-        Border emptyBorder = BorderFactory.createEmptyBorder(0, 0, 0, 20);
+        Border outerEmptyBorder = BorderFactory.createEmptyBorder(0, 16, 10, 18);
         Border outerBorder = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
-        buttonPanel.setBorder(BorderFactory.createCompoundBorder(outerBorder, emptyBorder));
+
+        buttonPanel.setBorder(BorderFactory.createCompoundBorder(outerEmptyBorder, outerBorder));
         buttonPanel.add(addBtn);
-        buttonPanel.add(updateBtn);
         buttonPanel.add(deleteBtn);
+        buttonPanel.add(updateBtn);
     }
 
     private void setUpTitlePanel() {
         titlePanel = new JPanel(new GridBagLayout());
-        titlePanel.add(title);
-        titlePanel.add(timeCombo);
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
         GridBagConstraints gc = new GridBagConstraints();
         gc.gridy = 0;
         gc.anchor = GridBagConstraints.CENTER;
-        gc.insets = new Insets(10, 0, 0, 0);
         titlePanel.add(title, gc);
 
-        JPanel panel = new JPanel(new FlowLayout());
-        panel.add(timeCombo);
-        panel.add(exportCombo);
+        JPanel controlPanel = new JPanel(new FlowLayout());
+        controlPanel.add(timeCombo);
+        controlPanel.add(exportCombo);
 
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        searchPanel.setPreferredSize(new Dimension(156, 26));
+        searchPanel.setBorder(BorderFactory.createLineBorder(new Color(112, 128, 160)));
+
+        searchPanel.add(searchField);
+        searchPanel.add(searchBtn);
+
+        controlPanel.add(searchPanel);
         gc.gridy = 1;
         gc.weightx = 1;
         gc.anchor = GridBagConstraints.FIRST_LINE_START;
-        gc.insets = new Insets(30, 13, 0, 0);
-        titlePanel.add(panel, gc);
+        gc.insets = new Insets(20, 13, 0, 0);
+        titlePanel.add(controlPanel, gc);
     }
 
     /**
@@ -310,44 +379,57 @@ public class TransactionTablePanel extends JPanel implements ItemListener {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                int row = table.getSelectedRow();
-                if (row < 0) {
-                    showWarning();
-                } else {
-                    int deleteConfirm = JOptionPane.showConfirmDialog(getRootPane(),
-                            "Are you sure you want to delete this item?", "Confirm delete", JOptionPane.OK_CANCEL_OPTION);
-                    if (deleteConfirm == JOptionPane.OK_OPTION) {
-                        Integer transId = (Integer) table.getValueAt(row, 0);
-                        Asset asset = new Asset();
-                        try {
-                            Transaction trans = transController.findById(transId);
-                            boolean success = transController.delete(transId);
-                            if (success) {
-                                deleteFromTable(trans);
-                                Integer assetId = trans.getAssetId();
-                                asset = assetController.findById(assetId);
-                                asset.setId(assetId);
-                                asset.setStock(asset.getStock() + trans.getAmount());
-                            }
-                        } catch (SQLException ex) {
-                            Logger.getLogger(TransactionTablePanel.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-
-                        FormEvent event = new FormEvent(this);
-                        event.setAsset(asset);
-                        if (deleteFormListener != null) {
-                            deleteFormListener.formEventOccured(event);
-                        }
-                    }
-                }
+                doDeleteAction();
             }
         });
+
+        ActionListener searchAction = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String pattern = searchField.getText();
+                newSearchFilter(pattern);
+            }
+        };
+
+        searchField.addActionListener(searchAction);
+        searchBtn.addActionListener(searchAction);
+    }
+
+    private void doDeleteAction() {
+        int row = table.getSelectedRow();
+        if (row < 0) {
+            showWarning();
+        } else {
+            int deleteConfirm = JOptionPane.showConfirmDialog(getRootPane(),
+                    "Are you sure you want to delete this item?", "Confirm delete", JOptionPane.OK_CANCEL_OPTION);
+            if (deleteConfirm == JOptionPane.OK_OPTION) {
+                Integer transId = (Integer) table.getValueAt(row, 0);
+                Asset asset = new Asset();
+                try {
+                    Transaction trans = transController.findById(transId);
+                    boolean success = transController.delete(transId);
+                    if (success) {
+                        deleteFromTable(trans);
+                        Integer assetId = trans.getAssetId();
+                        asset = assetController.findById(assetId);
+                        asset.setId(assetId);
+                        asset.setStock(asset.getStock() + trans.getAmount());
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(TransactionTablePanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                FormEvent event = new FormEvent(this);
+                event.setAsset(asset);
+                if (deleteFormListener != null) {
+                    deleteFormListener.formEventOccured(event);
+                }
+            }
+        }
     }
 
     private void showWarning() {
-        JOptionPane.showMessageDialog(getRootPane(),
-                "No row selected!",
-                "Error!", JOptionPane.WARNING_MESSAGE);
+        Utils.showWarningMessage(getRootPane(), "No row selected!");
     }
 
     private FormEvent getSelectedRowValues(int row) {
@@ -357,7 +439,6 @@ public class TransactionTablePanel extends JPanel implements ItemListener {
         YearMonth date = (YearMonth) table.getModel().getValueAt(row, 1);
         String assetNameAndId = (String) table.getModel().getValueAt(row, 2);
         int idStart = assetNameAndId.indexOf("(") + 1;
-        String assetName = assetNameAndId.substring(0, idStart - 1);
         Integer assetId = Integer.parseInt(assetNameAndId.substring(idStart,
                 assetNameAndId.length() - 1));
 
@@ -370,15 +451,15 @@ public class TransactionTablePanel extends JPanel implements ItemListener {
 
         Asset tempAsset = new Asset();
         tempAsset.setId(assetId);
-        tempAsset.setName(assetName);
 
         Period tempPeriod = new Period(date);
         Transaction tempTransaction = new Transaction(amount, price);
         tempTransaction.setId(transId);
+        tempTransaction.setAssetId(assetId);
 
         formEvent.setAsset(tempAsset);
         formEvent.setPeriod(tempPeriod);
-        formEvent.setTransaction(tempTransaction);
+        formEvent.setChangedTransaction(tempTransaction);
 
         return formEvent;
     }
@@ -405,23 +486,23 @@ public class TransactionTablePanel extends JPanel implements ItemListener {
         switch (index) {
             case 1:
                 startDate = now.minusYears(1).minusMonths(1);
-                newFilter(startDate);
+                newDateFilter(startDate);
                 break;
             case 2:
                 startDate = now.minusMonths(7);
-                newFilter(startDate);
+                newDateFilter(startDate);
                 break;
             case 3:
                 startDate = now.minusMonths(4);
-                newFilter(startDate);
+                newDateFilter(startDate);
                 break;
             case 4:
                 startDate = now.minusMonths(3);
-                newFilter(startDate);
+                newDateFilter(startDate);
                 break;
             case 5:
                 startDate = now.minusMonths(1);
-                newFilter(startDate);
+                newDateFilter(startDate);
                 break;
 
             default:

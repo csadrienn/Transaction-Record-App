@@ -13,8 +13,9 @@ import java.util.EventObject;
  */
 class FormEvent extends EventObject {
 
-    private Transaction transaction;
+    private Transaction changedTransaction;
     private Asset asset;
+    private Transaction oldTransaction;
     private Period period;
 
     /**
@@ -28,7 +29,7 @@ class FormEvent extends EventObject {
     }
 
     /**
-     * Create a FormEvent with specified source, transaction, asset and period.
+     * Create a FormEvent with specified source, changedTransaction, asset and period.
      *
      * @param source The object on which the Event initially occurred.
      * @param transaction The <code>Transaction</code> object passed this FormEvent to store.
@@ -37,27 +38,9 @@ class FormEvent extends EventObject {
      */
     public FormEvent(Object source, Transaction transaction, Asset asset, Period period) {
         this(source);
-        this.transaction = transaction;
+        this.changedTransaction = transaction;
         this.asset = asset;
         this.period = period;
-    }
-
-    /**
-     * Gets the transaction stored in the form event.
-     *
-     * @return A <code>Transaction</code> object.
-     */
-    public Transaction getTransaction() {
-        return transaction;
-    }
-
-    /**
-     * Sets the transaction to be stored in the form event.
-     *
-     * @param transaction A <code>Transaction</code> object the be stored.
-     */
-    public void setTransaction(Transaction transaction) {
-        this.transaction = transaction;
     }
 
     /**
@@ -95,4 +78,23 @@ class FormEvent extends EventObject {
     public void setPeriod(Period period) {
         this.period = period;
     }
+
+    public Transaction getChangedTransaction() {
+        return changedTransaction;
+    }
+
+    public void setChangedTransaction(Transaction changedTransaction) {
+        this.changedTransaction = changedTransaction;
+    }
+
+    public Transaction getOldTransaction() {
+        return oldTransaction;
+    }
+
+    public void setOldTransaction(Transaction oldTransaction) {
+        this.oldTransaction = oldTransaction;
+    }
+
+    
+    
 }

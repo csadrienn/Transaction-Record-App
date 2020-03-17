@@ -8,11 +8,9 @@ import com.csontaka.transaction_record_app.entity.Transaction;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -25,6 +23,7 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -98,12 +97,14 @@ public class AssetPanel extends JPanel implements ActionListener {
         selectedIdToUpdate = -1;
         decimalFormat.applyPattern("##0.00");
         formPanel = new JPanel();
-        Border border = BorderFactory.createEmptyBorder(10, 10, 10, 10);
-        Border lineB = BorderFactory.createLineBorder(Color.black);
-        formPanel.setBorder(BorderFactory.createCompoundBorder(border, lineB));
+        Border outer = BorderFactory.createEmptyBorder(34, 0, 10, 5);
+        Border inner = BorderFactory.createEmptyBorder(0, 5, 0, 5);
+        Border etched = BorderFactory.createEtchedBorder(Color.lightGray.brighter(), Color.gray);
+        Border comp = BorderFactory.createCompoundBorder(etched, inner);
+        formPanel.setBorder(BorderFactory.createCompoundBorder(outer, comp));
 
         tablePanel = new JPanel();
-        tablePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        tablePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 0));
 
         formPanelComponentSetUp();
         formPanelLayout();
@@ -115,31 +116,79 @@ public class AssetPanel extends JPanel implements ActionListener {
 
     }
 
+    /**
+     * Clears the panel's fields and sets them to not editable.
+     *
+     */
+    public void clearTextAndSelection() {
+        CardLayout cl = (CardLayout) buttonSwitchPanel.getLayout();
+        cl.show(buttonSwitchPanel, "options");
+        setSaveAndCancelBtnEnabled(false);
+        assetFormPanel.setTextFieldsEditable(false);
+        assetFormPanel.clearTextFields();
+    }
+
     private void formPanelComponentSetUp() {
         buttonSwitchPanel = new JPanel(new CardLayout());
-        optionsButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 10));
-        saveChangeButtonPanel = new JPanel();
+        optionsButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        saveChangeButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
 
         assetFormPanel = new AssetFormPanel(type, false);
 
-        addToStockBtn = new JButton("Add to Stock");
-        addToStockBtn.setFont(new Font("Lucida Sans Unicode", 0, 12));
+        Dimension btnSize = new Dimension(60, 30);
+        Icon addToStockIcon = Utils.createIcon("/images/increase20.png");
+        if (addToStockIcon != null) {
+            addToStockBtn = new JButton(addToStockIcon);
+            addToStockBtn.setPreferredSize(btnSize);
+        } else {
+            addToStockBtn = new JButton("Add to Stock");
+        }
+        Utils.setButtonLook(addToStockBtn, Color.GREEN.darker(), 12);
         addToStockBtn.addActionListener(this);
+        addToStockBtn.setToolTipText("Increase the stock number.");
 
-        deleteAssetBtn = new JButton("Delete");
-        deleteAssetBtn.setFont(new Font("Lucida Sans Unicode", 0, 12));
+        Icon deleteIcon = Utils.createIcon("/images/delete20.png");
+        if (deleteIcon != null) {
+            deleteAssetBtn = new JButton(deleteIcon);
+            deleteAssetBtn.setPreferredSize(btnSize);
+        } else {
+            deleteAssetBtn = new JButton("Delete");
+        }
+        Utils.setButtonLook(deleteAssetBtn, Color.RED.darker(), 12);
         deleteAssetBtn.addActionListener(this);
+        deleteAssetBtn.setToolTipText("Delete the item.");
 
-        editAssetBtn = new JButton("Edit");
-        editAssetBtn.setFont(new Font("Lucida Sans Unicode", 0, 12));
+        Icon editAssetIcon = Utils.createIcon("/images/edit20.png");
+        if (editAssetIcon != null) {
+            editAssetBtn = new JButton(editAssetIcon);
+            editAssetBtn.setPreferredSize(btnSize);
+        } else {
+            editAssetBtn = new JButton("Edit");
+        }
+        Utils.setButtonLook(editAssetBtn, Color.YELLOW.darker(), 12);
         editAssetBtn.addActionListener(this);
+        editAssetBtn.setToolTipText("Edit the item.");
 
-        saveAssetBtn = new JButton("Save");
-        saveAssetBtn.setFont(new Font("Lucida Sans Unicode", 0, 12));
+        Icon saveAssetIcon = Utils.createIcon("/images/ok20.png");
+        if (saveAssetIcon != null) {
+            saveAssetBtn = new JButton(saveAssetIcon);
+            saveAssetBtn.setPreferredSize(btnSize);
+            saveAssetBtn.setToolTipText("Save the new item.");
+        } else {
+            saveAssetBtn = new JButton("Save");
+        }
+        Utils.setButtonLook(saveAssetBtn, Color.GREEN.darker(), 12);
         saveAssetBtn.addActionListener(this);
 
-        cancelBtn = new JButton("Cancel");
-        cancelBtn.setFont(new Font("Lucida Sans Unicode", 0, 12));
+        Icon cancelIcon = Utils.createIcon("/images/cancel20.png");
+        if (cancelIcon != null) {
+            cancelBtn = new JButton(cancelIcon);
+            cancelBtn.setPreferredSize(btnSize);
+            cancelBtn.setToolTipText("Cancel.");
+        } else {
+            cancelBtn = new JButton("Cancel");
+        }
+        Utils.setButtonLook(cancelBtn, Color.RED.darker(), 12);
         cancelBtn.addActionListener(this);
 
         setFormButtonsEnabled(false);
@@ -176,7 +225,7 @@ public class AssetPanel extends JPanel implements ActionListener {
             ex.printStackTrace();
         }
 
-        showAddFormBtn.setFont(new Font("Lucida Sans Unicode", 0, 12));
+        Utils.setButtonLook(showAddFormBtn, 12);
         showAddFormBtn.addActionListener(this);
 
         radioGroup = new ButtonGroup();
@@ -198,8 +247,8 @@ public class AssetPanel extends JPanel implements ActionListener {
         assetTable = new JTable(tableModel);
         assetTable.setRowSorter(sorter);
         newFilter(0);
-        assetTable.getColumnModel().getColumn(0).setMaxWidth(30);
-        assetTable.getColumnModel().getColumn(2).setMaxWidth(50);
+        assetTable.getColumnModel().getColumn(0).setMaxWidth(40);
+        assetTable.getColumnModel().getColumn(2).setMaxWidth(60);
         tableScrollPane = new JScrollPane(assetTable);
 
         assetTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -221,17 +270,17 @@ public class AssetPanel extends JPanel implements ActionListener {
         tablePanel.setLayout(new BorderLayout());
         tablePanel.add(tableScrollPane, BorderLayout.CENTER);
 
-        JPanel showAddFormBtnPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gc = new GridBagConstraints();
-        gc.anchor = GridBagConstraints.FIRST_LINE_START;
-        gc.fill = GridBagConstraints.HORIZONTAL;
-        gc.insets = new Insets(5, 5, 15, 5);
-        showAddFormBtnPanel.add(showAddFormBtn, gc);
+        JPanel showAddFormBtnPanel = new JPanel();
+        showAddFormBtnPanel.add(showAddFormBtn);
+        Border empty = BorderFactory.createEmptyBorder(5, 0, 5, 0);
+        Border outer = BorderFactory.createEtchedBorder(Color.lightGray.brighter(), Color.gray);
+        showAddFormBtnPanel.setBorder(BorderFactory.createCompoundBorder(outer, empty));
         JPanel radioGroupPanel = new JPanel();
         radioGroupPanel.setLayout(new BoxLayout(radioGroupPanel, BoxLayout.X_AXIS));
         radioGroupPanel.add(allRadio);
         radioGroupPanel.add(inStockRadio);
         radioGroupPanel.add(outOfStockRadio);
+
         tablePanel.add(showAddFormBtnPanel, BorderLayout.SOUTH);
         tablePanel.add(radioGroupPanel, BorderLayout.NORTH);
     }
@@ -274,7 +323,7 @@ public class AssetPanel extends JPanel implements ActionListener {
         assetFormPanel.setNameFieldText(asset.getName());
         assetFormPanel.setDescAreaText(asset.getFeature());
         assetFormPanel.setStockFieldText(asset.getStock() + "");
-        double price = asset.getPlannedPrice() / 100.0;
+        double price = asset.getMaterialCost() / 100.0;
         assetFormPanel.setPriceFieldText(decimalFormat.format(price));
     }
 
@@ -334,11 +383,7 @@ public class AssetPanel extends JPanel implements ActionListener {
     }
 
     private void backToOptions() {
-        CardLayout cl = (CardLayout) buttonSwitchPanel.getLayout();
-        cl.show(buttonSwitchPanel, "options");
-        setSaveAndCancelBtnEnabled(false);
-        assetFormPanel.setTextFieldsEditable(false);
-        assetFormPanel.clearTextFields();
+        clearTextAndSelection();
     }
 
     private Asset saveAsset(Integer assetId) {
@@ -363,7 +408,7 @@ public class AssetPanel extends JPanel implements ActionListener {
             asset.setFeature(description);
             asset.setType(type);
             asset.setStock(stock);
-            asset.setPlannedPrice(price);
+            asset.setMaterialCost(price);
             try {
                 assetController.save(asset);
                 if (asset.getId() == null) {
@@ -449,14 +494,22 @@ public class AssetPanel extends JPanel implements ActionListener {
         deleteAssetBtn.setEnabled(enabled);
         editAssetBtn.setEnabled(enabled);
 
-        String toolTip = null;
-        if (!enabled) {
-            toolTip = "Select a row to use.";
-
+        if (enabled) {
+            Utils.setButtonLook(addToStockBtn, Color.GREEN.darker(), 12);
+            Utils.setButtonLook(deleteAssetBtn, Color.RED.darker(), 12);
+            Utils.setButtonLook(editAssetBtn, Color.YELLOW.darker(), 12);
+            addToStockBtn.setToolTipText("Increase stock number");
+            deleteAssetBtn.setToolTipText("Delete item");
+            editAssetBtn.setToolTipText("Edit item");
+        } else {
+            Utils.setButtonLook(addToStockBtn, Color.LIGHT_GRAY, 12);
+            Utils.setButtonLook(deleteAssetBtn, Color.LIGHT_GRAY, 12);
+            Utils.setButtonLook(editAssetBtn, Color.LIGHT_GRAY, 12);
+            String toolTip = "Select a row to use.";
+            addToStockBtn.setToolTipText(toolTip);
+            deleteAssetBtn.setToolTipText(toolTip);
+            editAssetBtn.setToolTipText(toolTip);
         }
-        addToStockBtn.setToolTipText(toolTip);
-        deleteAssetBtn.setToolTipText(toolTip);
-        editAssetBtn.setToolTipText(toolTip);
     }
 
     private void setSaveAndCancelBtnEnabled(boolean enabled) {

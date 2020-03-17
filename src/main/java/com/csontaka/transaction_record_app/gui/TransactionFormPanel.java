@@ -22,12 +22,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -64,7 +64,7 @@ public class TransactionFormPanel extends JPanel implements ItemListener {
     private String SEP = DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator() + "";
 
     private FormListener transactionFormListener;
-    private Transaction transToSave;
+    private Transaction oldTrans;
     private AssetType assetType;
     private List<Period> periodList;
     private List<Asset> assetList;
@@ -106,7 +106,7 @@ public class TransactionFormPanel extends JPanel implements ItemListener {
         successLabel.setVisible(false);
         saveButton = new JButton("Save");
         leaveButton = new JButton("Cancel");
-        transToSave = null;
+        oldTrans = null;
 
         dateCombo = new JComboBox(new String[0]);
         dateCombo.setPrototypeDisplayValue("0000/00");
@@ -133,16 +133,14 @@ public class TransactionFormPanel extends JPanel implements ItemListener {
      * price to fill the text fields.
      */
     public void setUpForUpdate(Asset asset, Period period, Transaction transaction) {
-        transToSave = transaction;
+        oldTrans = transaction;
         assetCombo.setSelectedItem(asset.getId() + ") " + asset.getName() + ": " + asset.getStock() + " pc");
-        assetCombo.setEnabled(false);
         assetCombo.setToolTipText("The equipment can not be changed.");
         if (assetType.equals(AssetType.PRODUCT)) {
             assetCombo.setToolTipText("The product can not be changed.");
         }
         dateCombo.setSelectedItem(DF.format(period.getDate()));
         amountTextField.setText(transaction.getAmount() + "");
-        amountTextField.setEnabled(false);
         amountTextField.setToolTipText("The amount can not be changed.");
         double price = transaction.getPrice() / 100.0;
         priceTextField.setText(DECIMAL_FORMAT.format(price));
@@ -156,13 +154,11 @@ public class TransactionFormPanel extends JPanel implements ItemListener {
      *
      */
     public void setUpForNew() {
-        transToSave = null;
-        assetCombo.setEnabled(true);
+        oldTrans = null;
         assetCombo.setToolTipText(null);
         assetCombo.setSelectedIndex(-1);
         int last = dateCombo.getItemCount() - 1;
         dateCombo.setSelectedIndex(last);
-        amountTextField.setEnabled(true);
         amountTextField.setToolTipText(null);
         amountTextField.setText("");
         priceTextField.setText("0" + SEP + "00");
@@ -273,81 +269,116 @@ public class TransactionFormPanel extends JPanel implements ItemListener {
     }
 
     private void doSaveButtonAction() {
+        FormEvent event = new FormEvent(this);
+
         YearMonth date = YearMonth.parse((String) dateCombo.getSelectedItem(), DF);
         Period period = periodList.stream()
                 .filter(p -> p.getDate().equals(date))
                 .findAny()
                 .orElse(null);
 
-        FormEvent event = new FormEvent(this);
         Asset asset = null;
-        String selectedAsset = (String) assetCombo.getSelectedItem();
-        int selectedNum = assetCombo.getSelectedIndex();
-        int comboSize = assetCombo.getItemCount();
+        boolean assetIsSelected = checkAssetSelection(assetCombo.getSelectedIndex());
+        String amountText = amountTextField.getText();
+        String priceText = priceTextField.getText().replace(SEP, "");
+        
+        if (assetIsSelected && checkNumbersValitidy(amountText) && checkNumbersValitidy(priceText)) {
+            asset = chooseAssetToSave();
+            if (checkNumbersValitidy(amountText) && checkNumbersValitidy(priceText)) {
+                int amount = Integer.parseInt(amountText);
+                int price = Integer.parseInt(priceText);
+                int assetStock = asset.getStock();
 
-        //if there is no selected asset
+                boolean enoughInStock;
+                Transaction changedTrans = new Transaction();
+                //if inserting a new transaction
+                if (oldTrans == null) {
+                    enoughInStock = checkEnoughInStock(amount, assetStock);
+                    
+                //if updating an existing transaction
+                } else {
+                    int oldAmount = oldTrans.getAmount();
+                    Integer oldAssetId = oldTrans.getAssetId();
+                    Asset oldAsset = assetList.stream()
+                            .filter(a -> Objects.equals(a.getId(), oldAssetId))
+                            .findAny()
+                            .orElse(null);
+                    if (asset.getId() != null && asset.getId().equals(oldAssetId)) {
+                        enoughInStock = checkEnoughInStock(amount, oldAsset.getStock() + oldAmount);
+                    } else {
+                        enoughInStock = checkEnoughInStock(amount, assetStock);
+                    }
+                }
+                if (enoughInStock) {
+                    if(oldTrans == null){
+                        asset.setStock(assetStock - amount);
+                    }else{
+                        changedTrans.setId(oldTrans.getId());
+                    }
+                    changedTrans.setAmount(amount);
+                    changedTrans.setPrice(price);
+                    changedTrans.setPeriodId(period.getId());
+
+                    event.setAsset(asset);
+                    event.setChangedTransaction(changedTrans);
+                    event.setOldTransaction(oldTrans);
+                    if (transactionFormListener != null) {
+                        transactionFormListener.formEventOccured(event);
+                    }
+                }   
+            }
+        }
+    }
+
+    private boolean checkAssetSelection(int selectedNum) {
         if (selectedNum == -1) {
             if (assetType.equals(AssetType.PRODUCT)) {
-                showWarningMessage("Please choose a product!");
+                Utils.showWarningMessage(getRootPane(),"Please choose a product!");
             } else {
-                showWarningMessage("Please choose an equipment!");
+                Utils.showWarningMessage(getRootPane(),"Please choose an equipment!");
             }
-            // if there is a selected item   
+            return false;
+        }
+        return true;
+
+    }
+
+    private boolean checkNumbersValitidy(String numText) {
+        if (!numText.matches("^[-]?[0-9]+$")) {
+            Utils.showWarningMessage(getRootPane(),"Please enter a valid number!");
+            return false;
+        }
+        if (numText.startsWith("-")) {
+            Utils.showWarningMessage(getRootPane(),"Please enter a positive number!");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkEnoughInStock(int amount, int stock) {
+        if (amount > stock) {
+            Utils.showWarningMessage(getRootPane(),"The amount (" + amount + ") can't be more than the "
+                    + "number of assets in stock (" + stock + ")");
+            return false;
+        }
+        return true;
+    }
+
+    private Asset chooseAssetToSave() {
+        String selectedAssetText = (String) assetCombo.getSelectedItem();
+        int selectedNum = assetCombo.getSelectedIndex();
+        int comboSize = assetCombo.getItemCount();
+        if (selectedNum == comboSize - 1) {
+            return assetToSave;
+
         } else {
-
-            //new item selected
-            if (selectedNum == comboSize - 1) {
-                asset = assetToSave;
-                //existing item selected    
-            } else {
-                int assetIdEnd = selectedAsset.indexOf(')');
-                int assetId = Integer.parseInt(selectedAsset.substring(0, assetIdEnd));
-                asset = assetList.stream()
-                        .filter(a -> a.getId() == assetId)
-                        .findAny()
-                        .orElse(null);
-            }
-
-            try {
-                int amount = Integer.parseInt(amountTextField.getText());
-                String priceStr = priceTextField.getText().replace(SEP, "");
-                int price = Integer.parseInt(priceStr);
-                int assetStock = asset.getStock();
-                if (amount > assetStock) {
-                    showWarningMessage("The amount (" + amount + ") can't be more than the "
-                            + "number of assets in stock (" + assetStock + ")");
-                    return;
-                }
-                //if updating an existing transaction
-                if (transToSave == null) {
-                    transToSave = new Transaction(amount, price);
-                    transToSave.setPeriodId(period.getId());
-                    //if insertin a new transaction
-                } else {
-                    transToSave.setAmount(amount);
-                    transToSave.setPrice(price);
-                    transToSave.setPeriodId(period.getId());
-                }
-                //if existing asset to add
-                if (selectedNum < comboSize - 1) {
-                    transToSave.setAssetId(asset.getId());
-                    int assetInStock = asset.getStock() - amount;
-                    asset.setStock(assetInStock);
-                    event.setAsset(asset);
-                    //if new asset to add
-                } else {
-                    int assetInStock = assetToSave.getStock() - amount;
-                    assetToSave.setStock(assetInStock);
-                    event.setAsset(assetToSave);
-                }
-                event.setTransaction(transToSave);
-
-                if (transactionFormListener != null) {
-                    transactionFormListener.formEventOccured(event);
-                }
-            } catch (NumberFormatException ex) {
-                showWarningMessage("Please enter a valid number!");
-            }
+            int assetIdEnd = selectedAssetText.indexOf(')');
+            int assetId = Integer.parseInt(selectedAssetText.substring(0, assetIdEnd));
+            Asset asset = assetList.stream()
+                    .filter(a -> a.getId() == assetId)
+                    .findAny()
+                    .orElse(null);
+            return asset;
         }
     }
 
@@ -369,31 +400,33 @@ public class TransactionFormPanel extends JPanel implements ItemListener {
     }
 
     private void setFonts() {
-        assetLabel.setFont(new Font("Lucida Sans Unicode", 0, 14)); // NOI18N
+        Font lucida14 = new Font("Lucida Sans Unicode", 0, 14);
+        assetLabel.setFont(lucida14);
         assetLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 
-        dateLabel.setFont(new Font("Lucida Sans Unicode", 0, 14));
+        dateLabel.setFont(lucida14);
         dateLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 
-        priceLabel.setFont(new Font("Lucida Sans Unicode", 0, 14));
+        priceLabel.setFont(lucida14);
         priceLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 
-        currencyLabel.setFont(new Font("Lucida Sans Unicode", 0, 14));
+        currencyLabel.setFont(lucida14);
         currencyLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 
-        amountLabel.setFont(new Font("Lucida Sans Unicode", 0, 14));
+        amountLabel.setFont(lucida14);
         amountLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 
         successLabel.setFont(new Font("Lucida Sans Unicode", 0, 12));
         successLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        assetCombo.setFont(new Font("Lucida Sans Unicode", 0, 14));
-        dateCombo.setFont(new Font("Lucida Sans Unicode", 0, 14));
+        assetCombo.setFont(lucida14);
+        dateCombo.setFont(lucida14);
 
-        saveButton.setFont(new Font("Lucida Sans Unicode", 0, 14));
-        saveButton.setPreferredSize(new Dimension(80, 35));
-        leaveButton.setFont(new Font("Lucida Sans Unicode", 0, 14));
-        leaveButton.setPreferredSize(new Dimension(80, 35));
+        Dimension d = new Dimension(80, 35);
+        saveButton.setFont(lucida14);
+        saveButton.setPreferredSize(d);
+        leaveButton.setFont(lucida14);
+        leaveButton.setPreferredSize(d);
     }
 
     private void setFormPanelLayout() {
@@ -510,7 +543,7 @@ public class TransactionFormPanel extends JPanel implements ItemListener {
                     int price = Integer.parseInt(priceText);
                     assetToSave = new Asset(name, description, assetType);
                     assetToSave.setStock(stock);
-                    assetToSave.setPlannedPrice(price);
+                    assetToSave.setMaterialCost(price);
 
                     assetCombo.removeItem(SELECTED_NEW_ASSET_OPTION);
                     String createdItem = "New product: " + assetToSave.getName()
@@ -534,11 +567,6 @@ public class TransactionFormPanel extends JPanel implements ItemListener {
     private void closeAndClearDialog() {
         newAssetDialog.setVisible(false);
         assetFormPanel.clearTextFields();
-    }
-
-    private void showWarningMessage(String message) {
-        JOptionPane.showMessageDialog(getRootPane(), message,
-                "Error", JOptionPane.WARNING_MESSAGE);
     }
 
     @Override

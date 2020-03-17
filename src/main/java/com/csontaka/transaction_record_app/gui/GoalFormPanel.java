@@ -21,7 +21,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -78,6 +77,7 @@ public class GoalFormPanel extends JPanel implements ItemListener {
         dateLabel = new JLabel("Date:");
         currencyLabel = new JLabel("£");
         confirmButton = new JButton("Save");
+        Utils.setButtonLook(confirmButton, 12);
 
         YearMonth ym = YearMonth.now();
         String[] dates = new String[MAX_PERIOD_DATE];
@@ -111,11 +111,11 @@ public class GoalFormPanel extends JPanel implements ItemListener {
 
                     } catch (NumberFormatException ex) {
                         message = "Please enter a valid number!";
-                        JOptionPane.showMessageDialog(getRootPane(), message, "Error", JOptionPane.ERROR_MESSAGE);
+                        Utils.showWarningMessage(getRootPane(), message);
                     }
                 } else {
                     message = "Please select a date!";
-                    JOptionPane.showMessageDialog(getRootPane(), message, "Error", JOptionPane.ERROR_MESSAGE);
+                    Utils.showWarningMessage(getRootPane(), message);
                 }
             }
         });

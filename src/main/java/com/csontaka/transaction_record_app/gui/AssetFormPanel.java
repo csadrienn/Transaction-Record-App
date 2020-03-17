@@ -9,7 +9,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -60,9 +59,9 @@ public class AssetFormPanel extends JPanel {
         stockLabel = new JLabel("Stock:");
         stockLabel.setFont(new Font("Lucida Sans Unicode", 0, 14));
         if (type.equals(AssetType.PRODUCT)) {
-            priceLabel = new JLabel("Planned price:");
+            priceLabel = new JLabel("Material cost:");
         } else {
-            priceLabel = new JLabel("Expected price");
+            priceLabel = new JLabel("Usual price");
         }
         priceLabel.setFont(new Font("Lucida Sans Unicode", 0, 14));
 
@@ -135,26 +134,26 @@ public class AssetFormPanel extends JPanel {
      */
     public boolean checkInput() {
         String sep = DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator() + "";
-        String name = nameField.getText();
-        String desc = descArea.getText();
-        String stockText = stockField.getText();
-        String priceText = priceField.getText();
+        String name = nameField.getText().trim();
+        String desc = descArea.getText().trim();
+        String stockText = stockField.getText().trim();
+        String priceText = priceField.getText().trim();
         if (priceText.equals("")) {
             priceText = "0" + sep + "00";
             priceField.setText(priceText);
         }
         priceText = priceText.replace(sep, "");
         if (name.equals("") || stockText.equals("")) {
-            showWarningMessage("The name and the stock field can not be empty!");
+            Utils.showWarningMessage(getRootPane(), "The name and the stock field can not be empty!");
             return false;
         }
         if (!priceText.matches("^[0-9]+$") || !stockText.matches("^[-]?[0-9]+$")) {
-            showWarningMessage("Please enter a valid number!");
+            Utils.showWarningMessage(getRootPane(), "Please enter a valid number!");
             return false;
         }
         int stock = Integer.parseInt(stockText);
         if (stock < 0) {
-            showWarningMessage("Please enter a positive stock number!");
+            Utils.showWarningMessage(getRootPane(), "Please enter a positive stock number!");
             return false;
         }
         return true;
@@ -230,11 +229,6 @@ public class AssetFormPanel extends JPanel {
      */
     public void setPriceFieldText(String text) {
         priceField.setText(text);
-    }
-
-    private void showWarningMessage(String message) {
-        JOptionPane.showMessageDialog(getRootPane(), message,
-                "Error", JOptionPane.WARNING_MESSAGE);
     }
 
 }
